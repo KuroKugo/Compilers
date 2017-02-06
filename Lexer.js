@@ -72,17 +72,46 @@ var intNextState;
 // testing the scanner with given varables with 1 char
 intCurrentState = intStartState;
 
-// testing the scanner with given varables with 1 char
+// testing the scanner with given varables with 1 or more char
 function doit(testChar) {
-    if (intArrValidGammer.includes(testChar)) {
-        intCurrentState = intStartState;
-        intNextState = intArrStates[intCurrentState][intArrValidGammer];
-        intCurrentState = intNextState;
-        console.log("Working");
-    } else {
-        console.log("ERROR");
+     intCurrentState = intStartState;
+    var sucess;
+    
+    var charArray = testChar.substring("");
+    
+    for (var i = 0; i < charArray.length; i++) {
+        
+        if (intArrValidGammer.includes(charArray[i])) {
+            intNextState = intArrStates[intCurrentState][intArrValidGammer.indexOf(charArray[i])];
+            intCurrentState = intNextState
+            if (intNextState == -1) {
+                console.log("ERROR at "+intCurrentState);
+                sucess = false;
+                break;
+            }
+            console.log("Moving to " + intNextState);
+            sucess = true;
+        } else {
+            console.log("ERROR at "+intCurrentState);
+            sucess = false;
+            break;
+            }
+        
     }
+    return sucess;
 }
+    /*while (intNextState !== -1) {
+        if (intArrValidGammer.includes(testChar)) {
+            intNextState = intArrStates[intCurrentState][intArrValidGammer.indexOf(testChar)];
+            intCurrentState = intNextState;
+            console.log("Working");
+            return true
+        } else {
+            console.log("ERROR at "+intCurrentState);
+            return false;
+        }
+    }*/
+
 
 
 

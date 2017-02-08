@@ -1,10 +1,10 @@
            //[ 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44]
-                  //    a   b   c   d   e   f   g   h   i   j   k   l   m   n   o   p   q   r   s   t   u   v   w   x   y   z   0   1   2   3   4   5   6   7   8   9   (   )   {   }   "   =   !   +
+                  //    a   b   c   d   e   f   g   h   i   j   k   l   m   n   o   p   q   r   s   t   u   v   w   x   y   z   0   1   2   3   4   5   6   7   8   9   (   )   {   }   "   =   !   +  ' '
           
-
-
 // array of valid grammer characters in our language
 var intArrValidGammer =  ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '{', '}', '"', '=', '!', '+', ' '];
+
+var intArrSeperators = ['(', ')', '{', '}', '=', '+', '!', ' '];
 
 //matrix for exceptance states of multilength key words
 var intArrStates =  [[ 41,  1, 41, 41, 41,  8, 41, 41, 13, 41, 41, 41, 41, 41, 41, 17, 41, 41, 22, 28, 41, 41, 32, 41, 41, 41, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 43, 44, 45, 46, 47, 37, 39, 48, 49],
@@ -59,7 +59,7 @@ var intArrStates =  [[ 41,  1, 41, 41, 41,  8, 41, 41, 13, 41, 41, 41, 41, 41, 4
                      [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]];
 
 // array of Accepting States
-var intArrAcceptStates = [ 1, 7, 8, 12, 13, 14, 16, 17, 21, 22, 27, 28, 31, 32, 36, 37, 38, 40, 41, 42, 43, 44, 45, 46, 47];
+var intArrAcceptStates = [ 1, 7, 8, 12, 13, 14, 16, 17, 21, 22, 27, 28, 31, 32, 36, 37, 38, 40, 41, 42, 43, 44, 45, 46, 47, 48];
 
 // int value of starting state
 var intStartState = 0;
@@ -67,14 +67,17 @@ var intStartState = 0;
 // int value of current state
 var intCurrentState;
 // in value of the next state
-var intNextState;
+var intNextState = intStartState;
 
 // testing the scanner with given varables with 1 char
-intCurrentState = intStartState;
+//intCurrentState = intStartState;
 
 // testing the scanner with given varables with 1 or more char
-function doit(testChar) {
-     intCurrentState = intStartState;
+function validGrammer(testChar) {
+    intCurrentState = intStartState;
+    
+    intNextState = intStartState;
+    
     var sucess;
     
     var charArray = testChar.substring("");
@@ -82,8 +85,31 @@ function doit(testChar) {
     for (var i = 0; i < charArray.length; i++) {
         
         if (intArrValidGammer.includes(charArray[i])) {
+            //console.log("["+intCurrentState + "] "+ "["+intArrValidGammer.indexOf(charArray[i])+"]" + " current char is : " + charArray[i] + " Next State : " + intNextState);  
             intNextState = intArrStates[intCurrentState][intArrValidGammer.indexOf(charArray[i])];
-            intCurrentState = intNextState
+            console.log("["+intCurrentState + "] "+ "["+intArrValidGammer.indexOf(charArray[i])+"]" + " current char is : " + charArray[i] + " Next State : " + intNextState);  
+            
+            // Check if the charcter is a Seperator and if so then reset the state
+            if (intArrSeperators.includes(charArray[i])) {
+                if (charArray[i] == '!' && charArray[i+1] != '=') {
+                    console.log("ERROR at "+intCurrentState);
+                    sucess = false;
+                    break;
+                    }
+                if ((intCurrentState == 37 || intCurrentState == 39) && intNextState == 37) {
+                    intCurrentState = intNextState;
+                    continue;
+                }
+                  
+                intNextState = intStartState;
+            }
+            //if ((intCurrentState == 37 || intCurrentState = 39) charArray ) {
+                  
+             //   }
+            // Set the current state to the next state
+            intCurrentState = intNextState;
+                
+            // Check if going to the next state will lead to an invalid grammer
             if (intNextState == -1) {
                 console.log("ERROR at "+intCurrentState);
                 sucess = false;

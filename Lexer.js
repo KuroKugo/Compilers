@@ -4,7 +4,7 @@ var ValidWords = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm
 // array of valid grammer characters in our language
 var ValidGammer =  ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '{', '}', '"', '=', '!', '+', ' '];
 
-var Seperators = ['(', ')', '{', '}', '=', '+', '!', ' '];
+var Seperators = ['(', ')', '{', '}', '=', '+', '!', ' ', '\"'];
 
 //matrix for exceptance states of multilength key words
 var States =        [[ 41,  1, 41, 41, 41,  8, 41, 41, 13, 41, 41, 41, 41, 41, 41, 17, 41, 41, 22, 28, 41, 41, 32, 41, 41, 41, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 43, 44, 45, 46, 47, 37, 39, 48, 49],
@@ -73,15 +73,47 @@ function validGrammer(testChar) {
     CurrentState = StartState;
     var isNotEqualsOrEquals = false;
     var sucess = true;
+    var inQuote = false;
     
     var word = "";
     
     var charArray = testChar.substring("");
     
     for (var i = 0; i < charArray.length; i++) {
-        
         if (ValidGammer.includes(charArray[i])) {
             console.log("["+CurrentState+"]"+"["+States[CurrentState][ValidGammer.indexOf(charArray[i])]+"]" + "at char : "+ charArray[i]);
+            
+            
+        if (inQuote)
+            {
+                 if (charArray[i] == '\"')
+                {
+                    inQuote = !inQuote;
+                    
+                    CurrentState = States[0][ValidGammer.indexOf(charArray[i])];
+                    createToken(charArray[i], tokens);
+                    CurrentState = StartState;
+                    word = "";
+                    continue;
+                }
+                if ((charArray[i].charCodeAt(0) > 96 && charArray[i].charCodeAt(0) < 123) || charArray[i] == ' ')
+                    {
+                        CurrentState = 49;
+                        createToken(charArray[i], tokens);
+                        continue;
+                    }
+                else {
+                    console.log("ERROR only char's allowed within \" "+ CurrentState);
+                        sucess = false;
+                        break;
+                }
+               
+                
+            }
+            if (charArray[i] == '\"')
+                {
+                    inQuote = !inQuote;
+                }
             
             word = (word + charArray[i]);
             
@@ -153,49 +185,12 @@ function validGrammer(testChar) {
                     word = "";
                 }
             
-            // Check if the charcter is a Seperator and if so then reset the state
-           /* if (Seperators.includes(charArray[i])) {
-                    
-                if (isValidWord(word))
-                    {
-                        if (Seperators.includes(charArray[i]))
-                            {
-                            createToken(word, tokens);
-                            }
-                        word = "";
-                    }
-                else {
-                    console.log("ERROR bad word at "+CurrentState);
-                    sucess = false;
-                    break;
-                }
-                
-                if (charArray[i] == '!' && charArray[i+1] != '=') {
-                    console.log("ERROR at "+CurrentState);
-                    sucess = false;
-                    break;
-                    }
-                if ((charArray[i] == '!' || charArray[i] == '=') && charArray[i+1] == '=') {
-                    CurrentState = StartState;
-                    continue;
-                }
-            }*/
-            
-            
-          /*  if(i+1 == charArray.length && !AcceptStates.includes(CurrentState) && CurrentState != 0)
-                {
-                    
-                    console.log("ERROR Bad accept state at "+CurrentState);
-                    sucess = false;
-                    break;
-                }*/
-            
         } else {
             console.log("ERROR Bad Grammer at "+CurrentState);
             sucess = false;
             break;
         }
-    
+        
     }
     return tokens;
     return sucess;

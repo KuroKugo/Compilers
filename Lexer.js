@@ -80,7 +80,7 @@ function validGrammer(testChar) {
     //var programs = testChar.split("$");
     
     var charArray = testChar.substring("");
-    
+    console.log("LEXER: Start Lexing program...");
     for (var i = 0; i < charArray.length; i++) {
         
         if (ValidGammer.includes(charArray[i])) {
@@ -140,7 +140,7 @@ function validGrammer(testChar) {
             if(Seperators.includes(charArray[i+1])|| i+1 == charArray.length || Seperators.includes(charArray[i]))
                 {
                     if (charArray[i] == '!' && charArray[i+1] != '=') {
-                        console.log("ERROR ! must be followed by a = "+CurrentState);
+                        console.log("ERROR ! must be followed by a = ");
                         sucess = false;
                         break;
                     }
@@ -183,7 +183,7 @@ function validGrammer(testChar) {
                                             continue;
                                         }
                             else {
-                                console.log("ERROR Bad accept state at "+CurrentState);
+                                console.log("ERROR Invalid Grammer "+ word);
                                 sucess = false;
                                 break;
                             }
@@ -195,19 +195,19 @@ function validGrammer(testChar) {
                 }
             
         } else {
-            console.log("ERROR Bad Grammer at "+CurrentState);
+            console.log("ERROR Invalid Charcter "+charArray[i]);
             sucess = false;
             break;
         }
         
     }
-    console.log("LEXER: Start Lexing program...")
+    
     tokens.forEach(function (o)
     {
         console.log("LEXER: \"" + o.charValue + "\" ==> " + o.kind);
         if (o.charValue == '$')
             {
-                console.log("LEXER: Lexer completed successfully")
+                console.log("LEXER: Lexer completed successfully");
             }
     });
     return sucess;
@@ -221,7 +221,12 @@ function Token(kind, type, charValue)
     this.charValue = charValue;
     
 }
-
+//function printWord(Token)
+//{
+//    var char = "";
+//    char.concat("LEXER: \"" + Token.charValue + "\" ==> " + Token.kind);
+//    return char;
+//}
 function createToken(char, tokens) {
     var kind;
     var type = null;

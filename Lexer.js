@@ -201,9 +201,14 @@ function validGrammer(testChar) {
         }
         
     }
+    console.log("LEXER: Start Lexing program...")
     tokens.forEach(function (o)
     {
         console.log("LEXER: \"" + o.charValue + "\" ==> " + o.kind);
+        if (o.charValue == '$')
+            {
+                console.log("LEXER: Lexer completed successfully")
+            }
     });
     return sucess;
 }

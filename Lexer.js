@@ -59,7 +59,7 @@ var States =        [[ 41,  1, 41, 41, 41,  8, 41, 41, 13, 41, 41, 41, 41, 41, 4
                      [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]];
 
 // array of Accepting States
-var AcceptStates = [ 1, 7, 8, 12, 13, 14, 16, 17, 21, 22, 27, 28, 31, 32, 36, 37, 38, 40, 41, 42, 43, 44, 45, 46, 47, 48];
+var AcceptStates = [ 1, 7, 8, 12, 13, 14, 16, 17, 21, 22, 27, 28, 31, 32, 36, 37, 38, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49];
 
 // int value of starting state
 var StartState = 0;
@@ -71,7 +71,7 @@ var CurrentState;
 function validGrammer(testChar) {
     var tokens = [];
     CurrentState = StartState;
-    
+    var isNotEqualsOrEquals = false;
     var sucess = true;
     
     var word = "";
@@ -83,22 +83,85 @@ function validGrammer(testChar) {
         if (ValidGammer.includes(charArray[i])) {
             console.log("["+CurrentState+"]"+"["+States[CurrentState][ValidGammer.indexOf(charArray[i])]+"]" + "at char : "+ charArray[i]);
             
-            if (!Seperators.includes(charArray[i])) {
-                word = (word + charArray[i]);
-            }
+            word = (word + charArray[i]);
             
             // Assign to currentstate the state you are going to
             CurrentState = States[CurrentState][ValidGammer.indexOf(charArray[i])];
+            console.log(CurrentState);
             
             //console.log("["+CurrentState+"]"+"["+States[CurrentState][ValidGammer.indexOf(charArray[i])]+"]");
             
            console.log("Current word : "+word);
             
+            if(isNotEqualsOrEquals)
+                {
+                    isNotEqualsOrEquals = false;
+                    createToken(word, tokens);
+                    CurrentState = StartState;
+                    word = "";
+                    continue;
+                }
+            
+            if(Seperators.includes(charArray[i+1])|| i+1 == charArray.length || Seperators.includes(charArray[i]))
+                {
+                    if (charArray[i] == '!' && charArray[i+1] != '=') {
+                        console.log("ERROR ! must be followed by a = "+CurrentState);
+                        sucess = false;
+                        break;
+                    }
+                    if (AcceptStates.includes(CurrentState) && !Seperators.includes(charArray[i]))
+                        {
+                            console.log(CurrentState);
+                            createToken(word, tokens);
+                        }
+                    else
+                    {
+                        if (AcceptStates.includes(CurrentState) && Seperators.includes(charArray[i]))
+                            {
+                                if (charArray[i] == ' ')
+                                    {
+                                        CurrentState = StartState;
+                                        word = "";
+                                    }
+                                else{
+                                    if (charArray[i] == '=' && charArray[i+1] == '=')
+                                        {
+                                            isNotEqualsOrEquals = true;
+                                            continue;
+                                        }
+                                    else {
+                                        console.log(CurrentState);
+                                        createToken(word, tokens);    
+                                    }
+                                }
+                            }
+                        else {
+                            if ((charArray[i] == '='|| charArray[i] == '!') && charArray[i+1] == '=')
+                                        {
+                                            isNotEqualsOrEquals = true;
+                                            continue;
+                                        }
+                            else {
+                                console.log("ERROR Bad accept state at "+CurrentState);
+                                sucess = false;
+                                break;
+                            }
+                        }
+                       
+                    }
+                    CurrentState = StartState;
+                    word = "";
+                }
+            
             // Check if the charcter is a Seperator and if so then reset the state
-            if (Seperators.includes(charArray[i])) {
+           /* if (Seperators.includes(charArray[i])) {
                     
                 if (isValidWord(word))
                     {
+                        if (Seperators.includes(charArray[i]))
+                            {
+                            createToken(word, tokens);
+                            }
                         word = "";
                     }
                 else {
@@ -116,17 +179,16 @@ function validGrammer(testChar) {
                     CurrentState = StartState;
                     continue;
                 }
-             CurrentState = StartState;
-            }
+            }*/
             
             
-            if(i+1 == charArray.length && !AcceptStates.includes(CurrentState) && CurrentState != 0)
+          /*  if(i+1 == charArray.length && !AcceptStates.includes(CurrentState) && CurrentState != 0)
                 {
                     
                     console.log("ERROR Bad accept state at "+CurrentState);
                     sucess = false;
                     break;
-                }
+                }*/
             
         } else {
             console.log("ERROR Bad Grammer at "+CurrentState);
@@ -189,11 +251,23 @@ function createToken(char, tokens) {
             //type = ;
             charValue = "if";
                 break;
+        case 21:
+            kind = "PRINT";
+            //type = ;
+            charValue = "print";
+                break;
         case 47:
             kind = "QUOTE";
             //type = ;
             charValue = "\"";
                 break;
+        case 31:
+            
+        case 12:
+            kind = "BOOLVAL";
+            //type = ;
+            charValue = char;
+            break;
         case 16:
                 
         case 7:

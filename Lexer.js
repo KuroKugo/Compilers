@@ -1,13 +1,13 @@
-           //[ 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44]
-                  //    a   b   c   d   e   f   g   h   i   j   k   l   m   n   o   p   q   r   s   t   u   v   w   x   y   z   0   1   2   3   4   5   6   7   8   9   (   )   {   }   "   =   !   +  ' '
+var ValidWords = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', "boolean", "false", "if", "int", "print", "string", "true", "while"];
           
-// array of valid grammer characters in our language
-var intArrValidGammer =  ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '{', '}', '"', '=', '!', '+', ' '];
 
-var intArrSeperators = ['(', ')', '{', '}', '=', '+', '!', ' '];
+// array of valid grammer characters in our language
+var ValidGammer =  ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '{', '}', '"', '=', '!', '+', ' '];
+
+var Seperators = ['(', ')', '{', '}', '=', '+', '!', ' '];
 
 //matrix for exceptance states of multilength key words
-var intArrStates =  [[ 41,  1, 41, 41, 41,  8, 41, 41, 13, 41, 41, 41, 41, 41, 41, 17, 41, 41, 22, 28, 41, 41, 32, 41, 41, 41, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 43, 44, 45, 46, 47, 37, 39, 48, 49],
+var States =        [[ 41,  1, 41, 41, 41,  8, 41, 41, 13, 41, 41, 41, 41, 41, 41, 17, 41, 41, 22, 28, 41, 41, 32, 41, 41, 41, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 43, 44, 45, 46, 47, 37, 39, 48, 49],
                      [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
                      [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
                      [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
@@ -59,88 +59,232 @@ var intArrStates =  [[ 41,  1, 41, 41, 41,  8, 41, 41, 13, 41, 41, 41, 41, 41, 4
                      [ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]];
 
 // array of Accepting States
-var intArrAcceptStates = [ 1, 7, 8, 12, 13, 14, 16, 17, 21, 22, 27, 28, 31, 32, 36, 37, 38, 40, 41, 42, 43, 44, 45, 46, 47, 48];
+var AcceptStates = [ 1, 7, 8, 12, 13, 14, 16, 17, 21, 22, 27, 28, 31, 32, 36, 37, 38, 40, 41, 42, 43, 44, 45, 46, 47, 48];
 
 // int value of starting state
-var intStartState = 0;
+var StartState = 0;
 
 // int value of current state
-var intCurrentState;
-// in value of the next state
-var intNextState = intStartState;
-
-// testing the scanner with given varables with 1 char
-//intCurrentState = intStartState;
+var CurrentState;
 
 // testing the scanner with given varables with 1 or more char
 function validGrammer(testChar) {
-    intCurrentState = intStartState;
+    var tokens = [];
+    CurrentState = StartState;
     
-    intNextState = intStartState;
+    var sucess = true;
     
-    var sucess;
+    var word = "";
     
     var charArray = testChar.substring("");
     
     for (var i = 0; i < charArray.length; i++) {
         
-        if (intArrValidGammer.includes(charArray[i])) {
-            //console.log("["+intCurrentState + "] "+ "["+intArrValidGammer.indexOf(charArray[i])+"]" + " current char is : " + charArray[i] + " Next State : " + intNextState);  
-            intNextState = intArrStates[intCurrentState][intArrValidGammer.indexOf(charArray[i])];
-            console.log("["+intCurrentState + "] "+ "["+intArrValidGammer.indexOf(charArray[i])+"]" + " current char is : " + charArray[i] + " Next State : " + intNextState);  
+        if (ValidGammer.includes(charArray[i])) {
+            console.log("["+CurrentState+"]"+"["+States[CurrentState][ValidGammer.indexOf(charArray[i])]+"]" + "at char : "+ charArray[i]);
+            
+            if (!Seperators.includes(charArray[i])) {
+                word = (word + charArray[i]);
+            }
+            
+            // Assign to currentstate the state you are going to
+            CurrentState = States[CurrentState][ValidGammer.indexOf(charArray[i])];
+            
+            //console.log("["+CurrentState+"]"+"["+States[CurrentState][ValidGammer.indexOf(charArray[i])]+"]");
+            
+           console.log("Current word : "+word);
             
             // Check if the charcter is a Seperator and if so then reset the state
-            if (intArrSeperators.includes(charArray[i])) {
+            if (Seperators.includes(charArray[i])) {
+                    
+                if (isValidWord(word))
+                    {
+                        word = "";
+                    }
+                else {
+                    console.log("ERROR bad word at "+CurrentState);
+                    sucess = false;
+                    break;
+                }
+                
                 if (charArray[i] == '!' && charArray[i+1] != '=') {
-                    console.log("ERROR at "+intCurrentState);
+                    console.log("ERROR at "+CurrentState);
                     sucess = false;
                     break;
                     }
-                if ((intCurrentState == 37 || intCurrentState == 39) && intNextState == 37) {
-                    intCurrentState = intNextState;
+                if ((charArray[i] == '!' || charArray[i] == '=') && charArray[i+1] == '=') {
+                    CurrentState = StartState;
                     continue;
                 }
-                  
-                intNextState = intStartState;
+             CurrentState = StartState;
             }
-            //if ((intCurrentState == 37 || intCurrentState = 39) charArray ) {
-                  
-             //   }
-            // Set the current state to the next state
-            intCurrentState = intNextState;
-                
-            // Check if going to the next state will lead to an invalid grammer
-            if (intNextState == -1) {
-                console.log("ERROR at "+intCurrentState);
-                sucess = false;
-                break;
-            }
-            console.log("Moving to " + intNextState);
-            sucess = true;
+            
+            
+            if(i+1 == charArray.length && !AcceptStates.includes(CurrentState) && CurrentState != 0)
+                {
+                    
+                    console.log("ERROR Bad accept state at "+CurrentState);
+                    sucess = false;
+                    break;
+                }
+            
         } else {
-            console.log("ERROR at "+intCurrentState);
+            console.log("ERROR Bad Grammer at "+CurrentState);
             sucess = false;
             break;
-            }
-        
+        }
+    
     }
+    return tokens;
     return sucess;
 }
-    /*while (intNextState !== -1) {
-        if (intArrValidGammer.includes(testChar)) {
-            intNextState = intArrStates[intCurrentState][intArrValidGammer.indexOf(testChar)];
-            intCurrentState = intNextState;
-            console.log("Working");
-            return true
-        } else {
-            console.log("ERROR at "+intCurrentState);
-            return false;
+function Token(kind, type, charValue)
+{
+    this.kind = kind;
+    
+    this.type = type;
+    
+    this.charValue = charValue;
+    
+}
+
+function createToken(char, tokens) {
+    var kind;
+    var type = null;
+    var charValue;
+    
+    switch (CurrentState) {
+        case 45:
+            kind = "LBRACE";
+            //type = ;
+            charValue = "{";    
+            break;
+        case 46:
+            kind = "RBRACE";
+            //type = ;
+            charValue = "}";
+                break;
+        case 43:
+            kind = "LPAREN";
+            //type = ;
+            charValue = "(";
+                break;
+        case 44:
+            kind = "RPAREN";
+            //type = ;
+            charValue = ")";
+                break;
+        case 37:
+            kind = "ASSIGN";
+            //type = ;
+            charValue = "=";
+                break;
+        case 36:
+            kind = "WHILE";
+            //type = ;
+            charValue = "while";
+                break;
+        case 14:
+            kind = "IF";
+            //type = ;
+            charValue = "if";
+                break;
+        case 47:
+            kind = "QUOTE";
+            //type = ;
+            charValue = "\"";
+                break;
+        case 16:
+                
+        case 7:
+                
+        case 27:
+            kind = "DATATYPE";
+            //type = ;
+            charValue = char;
+                break;
+        case 1:
+                
+        case 8:
+                
+        case 13:
+                
+        case 17:
+                
+        case 22:
+                
+        case 28:
+                
+        case 32:
+                
+        case 41:
+            kind = "ID";
+            //type = ;
+            charValue = char;
+                break;
+        case 42:
+            kind = "DIGIT";
+            //type = ;
+            charValue = char;
+                break;
+        case 38:
+                
+        case 40:
+            kind = "BOOLOP";
+            //type = ;
+            charValue = char;
+                break;
+        case 48:
+            kind = "INTOP";
+            //type = ;
+            charValue = "+";
+                break;
+        default:
+            kind = "CHAR";
+            //type = ;
+            charValue = char;
+                break;
+    }
+    tokens.push(new Token(kind, type, charValue));
+}
+
+
+function isValidWord(subChar) {
+    if (!subChar)
+        {
+            return true;
         }
-    }*/
+    return ValidWords.includes(subChar);
+    
+    
+}
 
-
-
-
+function checkWords (testChar) {
+    var currentChar, nextChar, i;
+    
+    var charArr = testChar.substring("");
+    
+    var charWord = "";
+    
+    for (i = 0; i < testChar.length; i++) {
+        currentChar = charArr[i];
+        nextChar = charArr[i + 1];
+        
+        if (!Seperators.includes(currentChar)) {
+            charWord = (charWord + currentChar);
+        } else {
+            if (isValidWord(charWord)) {
+                console.log("valid word");
+                charWord = "";
+            } else {
+                console.log("not valid word");
+                break;
+            }
+        }
+    }
+    return charWord;
+}
+ 
 
 
 

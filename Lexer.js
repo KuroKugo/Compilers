@@ -84,7 +84,7 @@ function validGrammer(testChar) {
     for (var i = 0; i < charArray.length; i++) {
         
         if (ValidGammer.includes(charArray[i])) {
-            console.log("["+CurrentState+"]"+"["+States[CurrentState][ValidGammer.indexOf(charArray[i])]+"]" + "at char : "+ charArray[i]);
+            //console.log("["+CurrentState+"]"+"["+States[CurrentState][ValidGammer.indexOf(charArray[i])]+"]" + "at char : "+ charArray[i]);
             
             
         if (inQuote)
@@ -122,11 +122,11 @@ function validGrammer(testChar) {
             
             // Assign to currentstate the state you are going to
             CurrentState = States[CurrentState][ValidGammer.indexOf(charArray[i])];
-            console.log(CurrentState);
+            //console.log(CurrentState);
             
             //console.log("["+CurrentState+"]"+"["+States[CurrentState][ValidGammer.indexOf(charArray[i])]+"]");
             
-           console.log("Current word : "+word);
+           //console.log("Current word : "+word);
             
             if(isNotEqualsOrEquals)
                 {
@@ -146,7 +146,7 @@ function validGrammer(testChar) {
                     }
                     if (AcceptStates.includes(CurrentState) && !Seperators.includes(charArray[i]))
                         {
-                            console.log(CurrentState);
+                            //console.log(CurrentState);
                             createToken(word, tokens);
                         }
                     else
@@ -171,7 +171,7 @@ function validGrammer(testChar) {
                                             continue;
                                         }
                                     else {
-                                        console.log(CurrentState);
+                                        //console.log(CurrentState);
                                         createToken(word, tokens);    
                                     }
                                 }
@@ -201,7 +201,10 @@ function validGrammer(testChar) {
         }
         
     }
-    return tokens;
+    tokens.forEach(function (o)
+    {
+        console.log("LEXER: \"" + o.charValue + "\" ==> " + o.kind);
+    });
     return sucess;
 }
 function Token(kind, type, charValue)

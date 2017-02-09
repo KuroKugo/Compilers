@@ -55,7 +55,20 @@
         </div><!--/.nav-collapse -->
       </div>
     </nav>
-      <script src="Lexer.js"></script>s</script>
+      
+      <div class="form-group">
+    <label for="program">Program</label>
+    <textarea class="form-control" rows="5" id="program"></textarea>
+      </div>
+      
+      <script src="Lexer.js"></script> </script>
+      <button type="button" class="btn btn-primary btn-lg" onclick="validGrammer(document.getElementById('program').value)">Run LEXER</button>
+    
+    <div class="form-group">
+    <label for="result">Result</label>
+    <textarea class="form-control" rows="5" id="result"></textarea>
+      </div>
+      
 
 
     <!-- Bootstrap core JavaScript

@@ -2,7 +2,7 @@ var ValidWords = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm
           
 
 // array of valid grammer characters in our language
-var ValidGammer =  ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '{', '}', '"', '=', '!', '+', ' ', '$'];
+var ValidGammer =  ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '{', '}', '"', '=', '!', '+', ' ', '$', '\n'];
 
 var Seperators = ['(', ')', '{', '}', '=', '+', '!', ' ', '\"', '$'];
 
@@ -67,6 +67,8 @@ var StartState = 0;
 // int value of current state
 var CurrentState;
 
+var result;
+
 // testing the scanner with given varables with 1 or more char
 function validGrammer(testChar) {
     var tokens = [];
@@ -74,18 +76,25 @@ function validGrammer(testChar) {
     var isNotEqualsOrEquals = false;
     var sucess = true;
     var inQuote = false;
+    result = "";
+    
+    $('#result').text("");
     
     var word = "";
     
     //var programs = testChar.split("$");
     
     var charArray = testChar.substring("");
-    console.log("LEXER: Start Lexing program...");
+    result = result.concat("LEXER: Start Lexing program...\n");
+    
     for (var i = 0; i < charArray.length; i++) {
         
         if (ValidGammer.includes(charArray[i])) {
             //console.log("["+CurrentState+"]"+"["+States[CurrentState][ValidGammer.indexOf(charArray[i])]+"]" + "at char : "+ charArray[i]);
-            
+            if (charArray[i] == '\n')
+                {
+                    continue;
+                }
             
         if (inQuote)
             {
@@ -204,13 +213,15 @@ function validGrammer(testChar) {
     
     tokens.forEach(function (o)
     {
-        console.log("LEXER: \"" + o.charValue + "\" ==> " + o.kind);
+        result = result.concat("LEXER: \"" + o.charValue + "\" ==> " + o.kind + '\n');
         if (o.charValue == '$')
             {
-                console.log("LEXER: Lexer completed successfully");
+                result = result.concat("LEXER: Lexer completed successfully\n");
+                //result = result.concat("LEXER: Start Lexing program...\n");
             }
     });
-    return sucess;
+    $('#result').append(PrintResult());
+    console.log(result);
 }
 function Token(kind, type, charValue)
 {
@@ -220,6 +231,11 @@ function Token(kind, type, charValue)
     
     this.charValue = charValue;
     
+}
+
+function PrintResult ()
+{
+    return result;
 }
 //function printWord(Token)
 //{
@@ -345,58 +361,38 @@ function createToken(char, tokens) {
 }
 
 
-function isValidWord(subChar) {
-    if (!subChar)
-        {
-            return true;
-        }
-    return ValidWords.includes(subChar);
-    
-    
-}
+//function isValidWord(subChar) {
+//    if (!subChar)
+//        {
+//            return true;
+//        }
+//    return ValidWords.includes(subChar);
+//    
+//    
+//}
 
-function checkWords (testChar) {
-    var currentChar, nextChar, i;
-    
-    var charArr = testChar.substring("");
-    
-    var charWord = "";
-    
-    for (i = 0; i < testChar.length; i++) {
-        currentChar = charArr[i];
-        nextChar = charArr[i + 1];
-        
-        if (!Seperators.includes(currentChar)) {
-            charWord = (charWord + currentChar);
-        } else {
-            if (isValidWord(charWord)) {
-                console.log("valid word");
-                charWord = "";
-            } else {
-                console.log("not valid word");
-                break;
-            }
-        }
-    }
-    return charWord;
-}
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//function checkWords (testChar) {
+//    var currentChar, nextChar, i;
+//    
+//    var charArr = testChar.substring("");
+//    
+//    var charWord = "";
+//    
+//    for (i = 0; i < testChar.length; i++) {
+//        currentChar = charArr[i];
+//        nextChar = charArr[i + 1];
+//        
+//        if (!Seperators.includes(currentChar)) {
+//            charWord = (charWord + currentChar);
+//        } else {
+//            if (isValidWord(charWord)) {
+//                console.log("valid word");
+//                charWord = "";
+//            } else {
+//                console.log("not valid word");
+//                break;
+//            }
+//        }
+//    }
+//    return charWord;
+//}

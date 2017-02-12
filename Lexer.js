@@ -1,10 +1,10 @@
-var ValidWords = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', "boolean", "false", "if", "int", "print", "string", "true", "while"];
-          
+// CHRISTIAN SANTIAGO's REPO
+var ValidWords = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', "boolean", "false", "if", "int", "print", "string", "true", "while"];          
 
 // array of valid grammer characters in our language
 var ValidGammer =  ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '{', '}', '"', '=', '!', '+', ' ', '$', '\n'];
 
-var Seperators = ['(', ')', '{', '}', '=', '+', '!', ' ', '\"', '$'];
+var Seperators = ['(', ')', '{', '}', '=', '+', '!', ' ', '\"', '$', '\n'];
 
 //matrix for exceptance states of multilength key words
 var States =        [[ 41,  1, 41, 41, 41,  8, 41, 41, 13, 41, 41, 41, 41, 41, 41, 17, 41, 41, 22, 28, 41, 41, 32, 41, 41, 41, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 43, 44, 45, 46, 47, 37, 39, 48, 49, 50],
@@ -91,10 +91,6 @@ function validGrammer(testChar) {
         
         if (ValidGammer.includes(charArray[i])) {
             //console.log("["+CurrentState+"]"+"["+States[CurrentState][ValidGammer.indexOf(charArray[i])]+"]" + "at char : "+ charArray[i]);
-            if (charArray[i] == '\n')
-                {
-                    continue;
-                }
             
         if (inQuote)
             {
@@ -115,13 +111,17 @@ function validGrammer(testChar) {
                         continue;
                     }
                 else {
-                    console.log("ERROR only char's allowed within \" "+ CurrentState);
+                    result = result.concat("ERROR only char character's allowed within QUOTES \n");
                         sucess = false;
                         break;
                 }
                
                 
             }
+            if (charArray[i] == '\n')
+                {
+                    continue;
+                }
             if (charArray[i] == '\"')
                 {
                     inQuote = !inQuote;
@@ -149,7 +149,7 @@ function validGrammer(testChar) {
             if(Seperators.includes(charArray[i+1])|| i+1 == charArray.length || Seperators.includes(charArray[i]))
                 {
                     if (charArray[i] == '!' && charArray[i+1] != '=') {
-                        console.log("ERROR ! must be followed by a = ");
+                        result = result.concat("ERROR ! must be followed by a = \n");
                         sucess = false;
                         break;
                     }
@@ -192,7 +192,7 @@ function validGrammer(testChar) {
                                             continue;
                                         }
                             else {
-                                console.log("ERROR Invalid Grammer "+ word);
+                                result = result.concat("ERROR Invalid Grammer at "+ word+'\n');
                                 sucess = false;
                                 break;
                             }
@@ -204,7 +204,7 @@ function validGrammer(testChar) {
                 }
             
         } else {
-            console.log("ERROR Invalid Charcter "+charArray[i]);
+            result = result.concat("ERROR Invalid Charcter at "+charArray[i]+ '\n');
             sucess = false;
             break;
         }

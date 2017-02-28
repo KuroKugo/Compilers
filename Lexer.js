@@ -1,8 +1,8 @@
 // CHRISTIAN SANTIAGO's REPO
-var ValidWords = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', "boolean", "false", "if", "int", "print", "string", "true", "while"];          
+var ValidWords = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', "boolean", "false", "if", "int", "print", "string", "true", "while"];
 
 // array of valid grammer characters in our language
-var ValidGammer =  ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '{', '}', '"', '=', '!', '+', ' ', '$', '\n'];
+var ValidGrammar =  ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '{', '}', '"', '=', '!', '+', ' ', '$', '\n'];
 
 var Seperators = ['(', ')', '{', '}', '=', '+', '!', ' ', '\"', '$', '\n'];
 
@@ -69,18 +69,20 @@ var CurrentState;
 
 var result;
 
+var line;
+
 // testing the scanner with given varables with 1 or more char
-function validGrammer(testChar) {
+function validGrammar(testChar) {
     var tokens = [];
     CurrentState = StartState;
     var isNotEqualsOrEquals = false;
     var sucess = true;
     var inQuote = false;
     result = "";
-    
     $('#result').text("");
     
     var word = "";
+    line = 0;
     
     //var programs = testChar.split("$");
     
@@ -89,7 +91,7 @@ function validGrammer(testChar) {
     
     for (var i = 0; i < charArray.length; i++) {
         
-        if (ValidGammer.includes(charArray[i])) {
+        if (ValidGrammar.includes(charArray[i])) {
             //console.log("["+CurrentState+"]"+"["+States[CurrentState][ValidGammer.indexOf(charArray[i])]+"]" + "at char : "+ charArray[i]);
             
         if (inQuote)
@@ -98,7 +100,7 @@ function validGrammer(testChar) {
                 {
                     inQuote = !inQuote;
                     
-                    CurrentState = States[0][ValidGammer.indexOf(charArray[i])];
+                    CurrentState = States[0][ValidGrammar.indexOf(charArray[i])];
                     createToken(charArray[i], tokens);
                     CurrentState = StartState;
                     word = "";
@@ -120,6 +122,7 @@ function validGrammer(testChar) {
             }
             if (charArray[i] == '\n')
                 {
+                    line++;
                     continue;
                 }
             if (charArray[i] == '\"')
@@ -130,7 +133,7 @@ function validGrammer(testChar) {
             word = (word + charArray[i]);
             
             // Assign to currentstate the state you are going to
-            CurrentState = States[CurrentState][ValidGammer.indexOf(charArray[i])];
+            CurrentState = States[CurrentState][ValidGrammar.indexOf(charArray[i])];
             //console.log(CurrentState);
             
             //console.log("["+CurrentState+"]"+"["+States[CurrentState][ValidGammer.indexOf(charArray[i])]+"]");
@@ -192,7 +195,7 @@ function validGrammer(testChar) {
                                             continue;
                                         }
                             else {
-                                result = result.concat("ERROR Invalid Grammer at "+ word+'\n');
+                                result = result.concat("ERROR Invalid Grammar at "+ word+'\n');
                                 sucess = false;
                                 break;
                             }
@@ -247,52 +250,62 @@ function createToken(char, tokens) {
     var kind;
     var type = null;
     var charValue;
+    var line;
     
     switch (CurrentState) {
         case 45:
             kind = "LBRACE";
             //type = ;
-            charValue = "{";    
+            charValue = "{"; 
+            this.line = line;
             break;
         case 46:
             kind = "RBRACE";
             //type = ;
             charValue = "}";
+            this.line = line;
                 break;
         case 43:
             kind = "LPAREN";
             //type = ;
             charValue = "(";
+            this.line = line;
                 break;
         case 44:
             kind = "RPAREN";
             //type = ;
             charValue = ")";
+            this.line = line;
                 break;
         case 37:
             kind = "ASSIGN";
             //type = ;
             charValue = "=";
+            this.line = line;
                 break;
         case 36:
             kind = "WHILE";
             //type = ;
             charValue = "while";
+            this.line = line;
                 break;
         case 14:
             kind = "IF";
             //type = ;
             charValue = "if";
+            this.line = line;
                 break;
         case 21:
             kind = "PRINT";
             //type = ;
             charValue = "print";
+            this.line = line;
                 break;
         case 47:
             kind = "QUOTE";
             //type = ;
             charValue = "\"";
+            this.line = line;
                 break;
         case 31:
             
@@ -300,6 +313,7 @@ function createToken(char, tokens) {
             kind = "BOOLVAL";
             //type = ;
             charValue = char;
+            this.line = line;
             break;
         case 16:
                 
@@ -309,6 +323,7 @@ function createToken(char, tokens) {
             kind = "DATATYPE";
             //type = ;
             charValue = char;
+            this.line = line;
                 break;
         case 1:
                 
@@ -328,11 +343,13 @@ function createToken(char, tokens) {
             kind = "ID";
             //type = ;
             charValue = char;
+            this.line = line;
                 break;
         case 42:
             kind = "DIGIT";
             //type = ;
             charValue = char;
+            this.line = line;
                 break;
         case 38:
                 
@@ -340,59 +357,26 @@ function createToken(char, tokens) {
             kind = "BOOLOP";
             //type = ;
             charValue = char;
+            this.line = line;
                 break;
         case 48:
             kind = "INTOP";
             //type = ;
             charValue = "+";
+            this.line = line;
                 break;
         case 50:
             kind = "EOP"
             //type = :
             charValue = "$";
+            this.line = line;
             break;
         default:
             kind = "CHAR";
             //type = ;
             charValue = char;
+            this.line = line;
                 break;
     }
     tokens.push(new Token(kind, type, charValue));
 }
-
-
-//function isValidWord(subChar) {
-//    if (!subChar)
-//        {
-//            return true;
-//        }
-//    return ValidWords.includes(subChar);
-//    
-//    
-//}
-
-//function checkWords (testChar) {
-//    var currentChar, nextChar, i;
-//    
-//    var charArr = testChar.substring("");
-//    
-//    var charWord = "";
-//    
-//    for (i = 0; i < testChar.length; i++) {
-//        currentChar = charArr[i];
-//        nextChar = charArr[i + 1];
-//        
-//        if (!Seperators.includes(currentChar)) {
-//            charWord = (charWord + currentChar);
-//        } else {
-//            if (isValidWord(charWord)) {
-//                console.log("valid word");
-//                charWord = "";
-//            } else {
-//                console.log("not valid word");
-//                break;
-//            }
-//        }
-//    }
-//    return charWord;
-//}

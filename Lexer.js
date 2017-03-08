@@ -72,7 +72,7 @@ var result;
 var line;
 
 // testing the scanner with given varables with 1 or more char
-function validGrammar(testChar) {
+function lexer(testChar) {
     var tokens = [];
     CurrentState = StartState;
     var isNotEqualsOrEquals = false;
@@ -225,7 +225,14 @@ function validGrammar(testChar) {
     });
     $('#result').append(PrintResult());
     console.log(result);
+    return tokens;
 }
+
+function PrintResult ()
+{
+    return result;
+}
+
 function Token(kind, type, charValue)
 {
     this.kind = kind;
@@ -233,19 +240,7 @@ function Token(kind, type, charValue)
     this.type = type;
     
     this.charValue = charValue;
-    
 }
-
-function PrintResult ()
-{
-    return result;
-}
-//function printWord(Token)
-//{
-//    var char = "";
-//    char.concat("LEXER: \"" + Token.charValue + "\" ==> " + Token.kind);
-//    return char;
-//}
 function createToken(char, tokens) {
     var kind;
     var type = null;

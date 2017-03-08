@@ -1,3 +1,9 @@
+function parse(testchar) {
+    var tokenList = [];
+    tokenList = lexer(testchar);
+    //parseProgram();  
+}
+
 //parse functions
 function parseProgram () {
     parseBlock();

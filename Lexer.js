@@ -233,74 +233,76 @@ function PrintResult ()
     return result;
 }
 
-function Token(kind, type, charValue)
+function Token(kind, type, charValue, lineNum)
 {
     this.kind = kind;
     
     this.type = type;
     
     this.charValue = charValue;
+    
+    this.lineNum = lineNum;
 }
 function createToken(char, tokens) {
     var kind;
     var type = null;
     var charValue;
-    var line;
+    var lineNum;
     
     switch (CurrentState) {
         case 45:
             kind = "LBRACE";
             //type = ;
             charValue = "{"; 
-            this.line = line;
+            lineNum = line;
             break;
         case 46:
             kind = "RBRACE";
             //type = ;
             charValue = "}";
-            this.line = line;
+            lineNum = line;
                 break;
         case 43:
             kind = "LPAREN";
             //type = ;
             charValue = "(";
-            this.line = line;
+            lineNum = line;
                 break;
         case 44:
             kind = "RPAREN";
             //type = ;
             charValue = ")";
-            this.line = line;
+            lineNum = line;
                 break;
         case 37:
             kind = "ASSIGN";
             //type = ;
             charValue = "=";
-            this.line = line;
+            lineNum = line;
                 break;
         case 36:
             kind = "WHILE";
             //type = ;
             charValue = "while";
-            this.line = line;
+            lineNum = line;
                 break;
         case 14:
             kind = "IF";
             //type = ;
             charValue = "if";
-            this.line = line;
+            lineNum = line;
                 break;
         case 21:
             kind = "PRINT";
             //type = ;
             charValue = "print";
-            this.line = line;
+            lineNum = line;
                 break;
         case 47:
             kind = "QUOTE";
             //type = ;
             charValue = "\"";
-            this.line = line;
+            lineNum = line;
                 break;
         case 31:
             
@@ -308,7 +310,7 @@ function createToken(char, tokens) {
             kind = "BOOLVAL";
             //type = ;
             charValue = char;
-            this.line = line;
+            lineNum = line;
             break;
         case 16:
                 
@@ -318,7 +320,7 @@ function createToken(char, tokens) {
             kind = "DATATYPE";
             //type = ;
             charValue = char;
-            this.line = line;
+            lineNum = line;
                 break;
         case 1:
                 
@@ -338,13 +340,13 @@ function createToken(char, tokens) {
             kind = "ID";
             //type = ;
             charValue = char;
-            this.line = line;
+            lineNum = line;
                 break;
         case 42:
             kind = "DIGIT";
             //type = ;
             charValue = char;
-            this.line = line;
+            lineNum = line;
                 break;
         case 38:
                 
@@ -352,26 +354,26 @@ function createToken(char, tokens) {
             kind = "BOOLOP";
             //type = ;
             charValue = char;
-            this.line = line;
+            lineNum = line;
                 break;
         case 48:
             kind = "INTOP";
             //type = ;
             charValue = "+";
-            this.line = line;
+            lineNum = line;
                 break;
         case 50:
             kind = "EOP"
             //type = :
             charValue = "$";
-            this.line = line;
+            lineNum = line;
             break;
         default:
             kind = "CHAR";
             //type = ;
             charValue = char;
-            this.line = line;
+            lineNum = line;
                 break;
     }
-    tokens.push(new Token(kind, type, charValue));
+    tokens.push(new Token(kind, type, charValue, lineNum));
 }

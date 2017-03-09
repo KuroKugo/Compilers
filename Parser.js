@@ -9,8 +9,20 @@ function parse(testchar) {
     currentIndex = 0;
     tokenList = lexer(testchar);
     result = "";
+    var programs = 0;
     
+    tokenList.forEach(function (o)
+    {
+       if(o.kind == "EOP")
+           {
+               programs++;
+           }
+    });
     
+    //console.log(programs);
+    
+    while (programs > 0)
+        {
    try {
         parseProgram();
    }
@@ -23,6 +35,11 @@ function parse(testchar) {
     document.getElementById("parseResult").append(tree);
     //console.log(tree);
    // $('#result').append(tree);
+            programs--;
+            //console.log(programs);
+            csTree = new Tree;
+            //csTree = ;
+        }
 }
 
 //parse functions

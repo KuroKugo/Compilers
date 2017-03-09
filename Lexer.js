@@ -224,7 +224,7 @@ function lexer(testChar) {
             }
     });
     $('#lexResult').append(PrintResult());
-    console.log(result);
+    //console.log(result);
     return tokens;
 }
 

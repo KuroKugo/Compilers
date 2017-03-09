@@ -10,6 +10,7 @@ function parse(testchar) {
     tokenList = lexer(testchar);
     result = "";
     
+    
    try {
         parseProgram();
    }
@@ -17,9 +18,10 @@ function parse(testchar) {
         result = result.concat(e + "The parser ended unsuccessfully");
         //console.log(e.message);
     }
-    $('#result').append(PrintResult());
+    //$('#parseResult').append(PrintResult());
     var tree = csTree.toString();
-    console.log(tree);
+    document.getElementById("parseResult").append(tree);
+    //console.log(tree);
    // $('#result').append(tree);
 }
 
@@ -51,18 +53,22 @@ function parseBlock () {
 }
 
 function parseStatementList () {
-    csTree.addNode("StatmentList", "branch");
+    
     
     if(tokenList[currentIndex].kind != "RBRACE") {
+        csTree.addNode("StatmentList", "branch");
+        
             parseStatement();
     
             parseStatementList();
+        
+        csTree.endChildren();
         }
     else {
             // do nothing for epsilon
         }
     
-    csTree.endChildren();
+    
 }
 
 function parseStatement () {
@@ -240,18 +246,22 @@ function parseId () {
 }
 
 function parseCharList () {
-    csTree.addNode("CharList", "branch");
+    
     
     if (tokenList[currentIndex].kind == "CHAR") { 
+        csTree.addNode("CharList", "branch");
+        
     //match char
         match("CHAR");
     
         parseCharList();
+        
+        csTree.endChildren();
     } else {
         //do nothing for epsilon   
     }
     
-    csTree.endChildren();
+    
 }
 
 function match (expectedToken) {

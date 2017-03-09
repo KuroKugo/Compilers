@@ -223,7 +223,7 @@ function lexer(testChar) {
                 //result = result.concat("LEXER: Start Lexing program...\n");
             }
     });
-    $('#result').append(PrintResult());
+    $('#lexResult').append(PrintResult());
     console.log(result);
     return tokens;
 }

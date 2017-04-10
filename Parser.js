@@ -2,6 +2,7 @@ var tokenList;
 var currentIndex;
 var result;
 var csTree;
+var sucess = false;
 
 function parse(testchar) {
     csTree = new Tree;
@@ -24,7 +25,7 @@ function parse(testchar) {
     while (programs > 0)
         {
    try {
-        parseProgram();
+        parseProgram();    
    }
     catch(e){
         result = result.concat(e + "The parser ended unsuccessfully");
@@ -33,12 +34,17 @@ function parse(testchar) {
     //$('#parseResult').append(PrintResult());
     var tree = csTree.toString();
     document.getElementById("parseResult").append(tree);
+    document.getElementById("parseResult").append(result);
     //console.log(tree);
    // $('#result').append(tree);
             programs--;
             //console.log(programs);
             csTree = new Tree;
             //csTree = ;
+    }
+    if (sucess)// if the parser completes
+        {
+            ast(testchar);
         }
 }
 
@@ -51,6 +57,7 @@ function parseProgram () {
     //match $
     match("EOP");
     
+    sucess = true;
 }
 
 function parseBlock () {
@@ -106,7 +113,7 @@ function parseStatement () {
     } else {
         //console.log("CHESSE");
         //console.log("Error : expexted \" print, id, a datatype, while, if, or {, recived \" " + tokenList[currentIndex].charValue + " at line " + tokenList[currentIndex].lineNum + "\n");
-        throw "Error : expexted \" print, id, a datatype, while, if, or {\" recived  " + tokenList[currentIndex].charValue + " at line " + tokenList[currentIndex].lineNum + "\n";
+        throw "Error : expexted  print, id, a datatype, while, if, or { recived  " + tokenList[currentIndex].charValue + " at line " + tokenList[currentIndex].lineNum + "\n";
     }
     
     csTree.endChildren();
@@ -191,7 +198,7 @@ function parseExpr () {
     } else if(tokenList[currentIndex].kind == "ID") {
         parseId();   
     } else {
-        throw "Error : expexted \" a digit, \", (, a boolean value, or an id\" recived  " + tokenList[currentIndex].charValue + " at line " + tokenList[currentIndex].lineNum + "\n";;
+        throw "Error : expexted  a digit, \", (, a boolean value, or an id recived  " + tokenList[currentIndex].charValue + " at line " + tokenList[currentIndex].lineNum + "\n";;
     }
     
     csTree.endChildren();
@@ -247,7 +254,7 @@ function parseBooleanExpr () {
     //match boolval
         match("BOOLVAL");
     } else {
-        throw "Error : expexted \" ( or a boolean value\" recived  " + tokenList[currentIndex].charValue + " at line " + tokenList[currentIndex].lineNum + "\n";;
+        throw "Error : expexted  ( or a boolean value recived  " + tokenList[currentIndex].charValue + " at line " + tokenList[currentIndex].lineNum + "\n";;
     }
     
     csTree.endChildren();

@@ -21,7 +21,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Lexer</title>
+    <title>Compiler</title>
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
       
@@ -63,9 +63,10 @@
       </div>
       
        <div class="col-md-1">
-      <button type="button" class="btn btn-primary btn-lg" onclick="parse($('#program').val())">Run Parser</button>
+      <button type="button" class="btn btn-primary btn-lg" onclick="parse($('#program').val())">Run Compiler</button>
       <script src="Parser.js"></script></script>
     <script src="Lexer.js"></script></script>
+    <script src="SymanticAnalysis.js"></script></script>
     </div>
     
     <div class="col-md-4">
@@ -73,13 +74,22 @@
     <textarea class="form-control" rows="20" id="lexResult"></textarea>
       </div>
 
-<div class="col-md-5">
+<div class="col-md-2">
+</div>
+
+    <div class="col-md-4">
+    <label for="parseResult">AST Result</label>
+    <textarea class="form-control" rows="20" id="astResult"></textarea>
+      </div>
+<div class="col-md-1">
 </div>
 
     <div class="col-md-4">
     <label for="parseResult">Parse Result</label>
     <textarea class="form-control" rows="20" id="parseResult"></textarea>
       </div>
+
+
       
 
 

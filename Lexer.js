@@ -87,6 +87,11 @@ function lexer(testChar) {
     //var programs = testChar.split("$");
     
     var charArray = testChar.substring("");
+    if (charArray[charArray.length-1] != '$') // If the program does not end in $ add the End Of Program marker
+        {
+            testChar = testChar.concat("$");
+            charArray = testChar.substring("");
+        }
     result = result.concat("LEXER: Start Lexing program...\n");
     
     for (var i = 0; i < charArray.length; i++) {
@@ -113,7 +118,7 @@ function lexer(testChar) {
                         continue;
                     }
                 else {
-                    result = result.concat("ERROR only char character's allowed within QUOTES \n");
+                    result = result.concat("ERROR only char character's allowed within QUOTES \n Will not proceed to Parse\n");
                         sucess = false;
                         break;
                 }
@@ -133,8 +138,8 @@ function lexer(testChar) {
             word = (word + charArray[i]);
             
             // Assign to currentstate the state you are going to
+            
             CurrentState = States[CurrentState][ValidGrammar.indexOf(charArray[i])];
-            //console.log(CurrentState);
             
             //console.log("["+CurrentState+"]"+"["+States[CurrentState][ValidGammer.indexOf(charArray[i])]+"]");
             
@@ -152,7 +157,7 @@ function lexer(testChar) {
             if(Seperators.includes(charArray[i+1])|| i+1 == charArray.length || Seperators.includes(charArray[i]))
                 {
                     if (charArray[i] == '!' && charArray[i+1] != '=') {
-                        result = result.concat("ERROR ! must be followed by a = \n");
+                        result = result.concat("ERROR ! must be followed by a = \nWill not proceed to Parse\n");
                         sucess = false;
                         break;
                     }
@@ -195,7 +200,7 @@ function lexer(testChar) {
                                             continue;
                                         }
                             else {
-                                result = result.concat("ERROR Invalid Grammar at "+ word+'\n');
+                                result = result.concat("ERROR Invalid Grammar at "+ word+'\n' + "Will not proceed to Parse\n");
                                 sucess = false;
                                 break;
                             }
@@ -205,9 +210,14 @@ function lexer(testChar) {
                     CurrentState = StartState;
                     word = "";
                 }
-            
+            if(charArray[i].charCodeAt(0) < 58 && charArray[i].charCodeAt(0) > 47 && charArray[i+1].charCodeAt(0) < 58 && charArray[i+1].charCodeAt(0) > 47)
+                {
+                    result = result.concat("ERROR numbers cannot be longer that 1 digit long\n" + "Will not proceed to Parse\n");
+                    sucess = false;
+                    break;
+                }
         } else {
-            result = result.concat("ERROR Invalid Charcter at "+charArray[i]+ '\n');
+            result = result.concat("ERROR Invalid Charcter at "+charArray[i]+ '\n'+ "Will not proceed to Parse\n");
             sucess = false;
             break;
         }

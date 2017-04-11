@@ -4,9 +4,15 @@ var result;
 var asTree;
 var words;
 var stringArr;
+var hash;
+var copy;
+var scopeTree;
+var scope;
+
 
 function ast(testchar) {
     asTree = new Tree;
+    scopeTree = new SymbolTree;
     tokenList = [];
     currentIndex = 0;
     tokenList = lexer(testchar);
@@ -15,7 +21,7 @@ function ast(testchar) {
     words = "";
     stringArr = [];
     
-    while(currentIndex < tokenList.length)
+    while(currentIndex < tokenList.length) // replace all char lists with the string equivalent
     {
         while(tokenList[currentIndex].kind == "CHAR")
         {
@@ -32,7 +38,7 @@ function ast(testchar) {
     }
     words = 0;
     currentIndex = 0;
-    console.log(stringArr[0]);
+    //console.log(stringArr[0]);
     
     tokenList.forEach(function (o)
     {
@@ -46,6 +52,7 @@ function ast(testchar) {
     
     while (programs > 0)
         {
+            scope = 0;
    try {
         parseASTProgram();
    }
@@ -57,6 +64,8 @@ function ast(testchar) {
     var tree = asTree.toString();
     document.getElementById("astResult").append(tree);
     document.getElementById("astResult").append(result);
+    tree = scopeTree.toString();
+    document.getElementById("stResult").append(tree);
     //console.log(tree);
    // $('#result').append(tree);
             programs--;
@@ -64,10 +73,12 @@ function ast(testchar) {
             asTree = new Tree;
             //asTree = ;
         }
+    console.log(scopeTree);
 }
 
 //parseAST functions
 function parseASTProgram () {
+    
     parseASTBlock();
     //skip $
     currentIndex++;
@@ -76,7 +87,8 @@ function parseASTProgram () {
 
 function parseASTBlock () {
     asTree.addNode("Block", "branch");
-    
+    scopeTree.addNode("Scope "+scope, "branch");
+    scope++;
     //skip the {
     currentIndex++;
     
@@ -88,6 +100,7 @@ function parseASTBlock () {
     currentIndex++;
     
     asTree.endChildren();
+    scopeTree.endChildren();
 }
 
 function parseASTStatementList () {
@@ -159,6 +172,16 @@ function parseASTAssignmentStatement () {
 
 function parseASTVarDecl () {
     asTree.addNode("VarDecl", "branch");
+    
+    if (scopeTree.cur.hashTable.hasItem(tokenList[currentIndex+1].charValue))// If the variable has been declared send error
+        {
+            console.log("You cannot redelcare variables");
+        }
+    else
+        {
+            copy = {datatype:tokenList[currentIndex].charValue, lineNumber:tokenList[currentIndex + 1].lineNum};
+            scopeTree.cur.hashTable.setItem(tokenList[currentIndex+1].charValue, copy);
+        }
     
     //match type
     matchAST("DATATYPE");

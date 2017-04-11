@@ -56,7 +56,8 @@
         </div><!--/.nav-collapse -->
       </div>
     </nav>
-      
+      <div class="col-md-1">
+</div>
       <div class="col-md-4">
     <label for="program">Program</label>
     <textarea class="form-control" rows="20" id="program"></textarea>
@@ -64,30 +65,38 @@
       
        <div class="col-md-1">
       <button type="button" class="btn btn-primary btn-lg" onclick="parse($('#program').val())">Run Compiler</button>
-      <script src="Parser.js"></script></script>
+    <script src="Tree.js"></script></script>
+    <script src="SymbolTree.js"></script></script>
+    <script src="HashTable.js"></script></script>
     <script src="Lexer.js"></script></script>
+    <script src="Parser.js"></script></script>
     <script src="SymanticAnalysis.js"></script></script>
     </div>
     
-    <div class="col-md-4">
+    <div class="col-md-2">
     <label for="lexResult">Lex Result</label>
-    <textarea class="form-control" rows="20" id="lexResult"></textarea>
+    <textarea class="form-control" rows="10" id="lexResult"></textarea>
+      </div>
+<div class="col-md-2">
+    <label for="parseResult">Parse Result</label>
+    <textarea class="form-control" rows="10" id="parseResult"></textarea>
       </div>
 
-<div class="col-md-2">
-</div>
-
-    <div class="col-md-4">
+    <div class="col-md-2">
     <label for="parseResult">AST Result</label>
-    <textarea class="form-control" rows="20" id="astResult"></textarea>
+    <textarea class="form-control" rows="10" id="astResult"></textarea>
       </div>
 <div class="col-md-1">
 </div>
 
-    <div class="col-md-4">
-    <label for="parseResult">Parse Result</label>
-    <textarea class="form-control" rows="20" id="parseResult"></textarea>
+    <div class="col-md-2">
+    <label for="parseResult">Symbol Tree Result</label>
+    <textarea class="form-control" rows="10" id="stResult"></textarea>
       </div>
+<div class="col-md-1">
+</div>
+
+    
 
 
       

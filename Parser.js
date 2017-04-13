@@ -42,10 +42,11 @@ function parse(testchar) {
             csTree = new Tree;
             //csTree = ;
     }
-    if (sucess)// if the parser completes
-        {
-            ast(testchar);
-        }
+//    if (sucess)// if the parser completes
+//        {
+//            ast(testchar);
+//        }
+    return tokenList;
 }
 
 //parse functions

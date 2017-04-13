@@ -48,12 +48,13 @@ function ast(testchar) {
     
     while (programs > 0)
         {
-            scope = 0;
+            scope = -1;
    try {
         parseASTProgram();
    }
     catch(e){
         result = result.concat(e + "The AST ended unsuccessfully \n");
+        console.log(e)
     }
             
     //$('#astResult').append(PrintResult());
@@ -82,15 +83,20 @@ function parseASTProgram () {
 
 function parseASTBlock () {
     asTree.addNode("Block", "branch");
-    scopeTree.addNode("Scope "+scope, "branch");
     scope++;
+    
+    scopeTree.addNode("Scope "+scope, "branch");
+    
     //skip the {
     currentIndex++;
+    
+    
     
     //check for antything that is not a }
     if(tokenList[currentIndex].kind != "RBRACE") {
             parseASTStatementList();   
         }
+    
     //skip the }
     currentIndex++;
     
@@ -152,9 +158,10 @@ function parseASTPrintStatement() {
 
 function parseASTAssignmentStatement () {
     asTree.addNode("AssignmentStatement", "branch");
-    
+
     parseASTId();
     
+    console.log("you made it");
     //skip =
     currentIndex++;
     
@@ -172,7 +179,7 @@ function parseASTVarDecl () {
         }
     else
         { // otherwise add it to the table
-            copy = {datatype:tokenList[currentIndex].charValue, lineNumber:tokenList[currentIndex + 1].lineNum};
+            copy = {datatype:tokenList[currentIndex].charValue, lineNumber:tokenList[currentIndex + 1].lineNum, used: "No", initialized: "No"};
             scopeTree.cur.hashTable.setItem(tokenList[currentIndex+1].charValue, copy);
         }
     
@@ -305,19 +312,28 @@ function parseASTBooleanExpr () {
 }
 
 function parseASTId () {
-   
-    if (scopeTree.cur.hashTable.hasItem(tokenList[currentIndex].charValue) || findVar(scopeTree.cur)) // If the variable has been declared continue
+    if (findVars(scopeTree.cur, currentIndex)) // If the variable has been declared continue
         {
-            // good
+            //good 
+            if (asTree.cur.name == "AssignmentStatement")
+            {
+                
+//                var item = getVars(scopeTree.cur, currentIndex);
+//                if (item != null)
+//                {
+//                    item.initialized = "Yes";
+//                    console.log(scopeTree);
+//                }
+            }
+            
         }
     else
         { // otherwise give a warning about using undeclared variables
             throw "You cannot use variable "+ tokenList[currentIndex].charValue + " as it has not been declared \n";
         }
-     
+    
     //match Id
     matchAST("ID");
-    
 }
 
 function parseASTCharList () {
@@ -353,6 +369,8 @@ function matchAST (expectedToken) {
 function checkIntType() {
    if (tokenList[currentIndex - 1].kind == "ASSIGN")// if the last token was an assignment
     {
+//        var item = getVars(scopeTree.cur, currentIndex - 2);
+//        console.log(item);
         if (scopeTree.cur.hashTable.getItem(tokenList[currentIndex - 2].charValue).datatype == "int")// if the id is of type int
             {
                 //continue 
@@ -584,53 +602,43 @@ function checkIdType() {
     }
 }
 
-
-var found;
-
-function findVar(parent)
+function getVars(node, index)
 {
-    if (parent.parent == null)
+    var stuff;
+    if (node.parent == null)
         {
-            console.log("Not Found");
-            found = false;   
+            console.log("Variable Not Found");
+            stuff = null;   
         }
     else 
     {
-        if(parent.hashTable.hasItem(tokenList[currentIndex].charValue))
+        if(node.hashTable.hasItem(tokenList[index].charValue))
         {
             console.log("Found it");
-            found = true;
+            stuff = parent.hashTable.getItem(tokenList[index].charValue);
         }
         else 
         {
-            findVar(parent.parent);
+            getVars(node.parent, index);
         }
-    }
-        
-            
-    return found;
+    }       
+    return stuff;
 }
 
-function findVars(parent, index)
+function findVars(node, index)
 {
-    if (parent.parent == null)
-        {
-            throw "Variable Not Found";
-            found = false;   
-        }
-    else 
+    if (node.hashTable.hasItem(tokenList[index].charValue))
     {
-        if(parent.hashTable.hasItem(tokenList[index].charValue))
-        {
-            console.log("Found it");
-            found = true;
-        }
-        else 
-        {
-            findVar(parent.parent);
-        }
+        console.log("Found it" + " at " + parent.name);
+        return true;
     }
-        
-            
-    return found;
+    else
+    {
+        if (node.parent == null)
+        {
+            console.log("Variable Not Found");
+            return false;
+        }
+        findVars(node.parent, index);
+    } 
 }

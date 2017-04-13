@@ -25,7 +25,7 @@ function SymbolTree() {
         var node = { name: name,
                      children: [],
                      parent: {},
-                     hashTable: new HashTable()
+                     hashTable: new HashTable(),
                    };
 
         // Check to see if it needs to be the root node.
@@ -90,7 +90,7 @@ function SymbolTree() {
                 // go thorough the hashtable and print the contents
                 for (var k in node.hashTable.items) {
                     if (node.hashTable.hasItem(k)) {
-                        traversalResult += ( k + " | " + node.hashTable.items[k].datatype + ",\n");
+                        traversalResult += ( k + " | " + node.hashTable.items[k].datatype + " | " + node.hashTable.items[k].lineNumber + " | " + node.name + ",\n");
                     }
                 }
                 
@@ -104,7 +104,7 @@ function SymbolTree() {
                 // go thorough the hashtable and print the contents
                 for (var k in node.hashTable.items) {
                     if (node.hashTable.hasItem(k)) {
-                        traversalResult += (k + " | " + node.hashTable.items[k].datatype + ",\n");
+                        traversalResult += (k + " | " + node.hashTable.items[k].datatype + " | " + node.hashTable.items[k].lineNumber + " | " + node.name + ",\n");
                     }
                 }
                 
@@ -124,4 +124,5 @@ function SymbolTree() {
     this.getTable = function() {
         return this.hashTable;
     }
+    
 }

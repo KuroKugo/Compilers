@@ -179,7 +179,7 @@ function parseASTVarDecl () {
         }
     else
         { // otherwise add it to the table
-            copy = {datatype:tokenList[currentIndex].charValue, lineNumber:tokenList[currentIndex + 1].lineNum, used: "No", initialized: "No"};
+            copy = {datatype:tokenList[currentIndex].charValue, lineNumber:tokenList[currentIndex + 1].lineNum, used: "No", initialized: "No", declared: "Yes"};
             scopeTree.cur.hashTable.setItem(tokenList[currentIndex+1].charValue, copy);
         }
     
@@ -314,6 +314,7 @@ function parseASTBooleanExpr () {
 function parseASTId () {
     if (findVars(scopeTree.cur, currentIndex)) // If the variable has been declared continue
         {
+            console.log("Found var "+ tokenList[currentIndex].charValue)
             //good 
             if (asTree.cur.name == "AssignmentStatement")
             {
@@ -369,9 +370,9 @@ function matchAST (expectedToken) {
 function checkIntType() {
    if (tokenList[currentIndex - 1].kind == "ASSIGN")// if the last token was an assignment
     {
-//        var item = getVars(scopeTree.cur, currentIndex - 2);
-//        console.log(item);
-        if (scopeTree.cur.hashTable.getItem(tokenList[currentIndex - 2].charValue).datatype == "int")// if the id is of type int
+        var item = getVars(scopeTree.cur, currentIndex - 2);
+        console.log(item);
+        if (item.datatype == "int")// if the id is of type int
             {
                 //continue 
                  
@@ -394,13 +395,13 @@ function checkIntType() {
                     if (findVars(scopeTree.cur, currentIndex - 2))// If the variable has been declared continue
                         //scopeTree.cur.hashTable.hasItem(tokenList[currentIndex - 2].charValue ||
                     {
-                        if (tokenList[currentIndex - 2].kind == "QUOTE" || scopeTree.cur.hashTable.getItem(tokenList[currentIndex - 2].charValue).datatype == "string") //if the last token was a "
+                        if (tokenList[currentIndex - 2].kind == "QUOTE" || item.datatype == "string") //if the last token was a "
                         {
                             throw "Cannot compare Strings and Ints";
                         }
                         else
                         {
-                            if (tokenList[currentIndex - 2].kind == "RPAREN" || tokenList[currentIndex - 2].kind == "BOOLVAL" || scopeTree.cur.hashTable.getItem(tokenList[currentIndex - 2].charValue).datatype == "boolean") //if the last token was a boolaen Expr
+                            if (tokenList[currentIndex - 2].kind == "RPAREN" || tokenList[currentIndex - 2].kind == "BOOLVAL" || item.datatype == "boolean") //if the last token was a boolaen Expr
                             {
                                 throw "Cannot compare Booleans and Ints";
                             }
@@ -423,7 +424,9 @@ function checkIntType() {
 function checkStringType() {
     if (tokenList[currentIndex - 1].kind == "ASSIGN")// if the last token was an assignment
     {
-        if (scopeTree.cur.hashTable.getItem(tokenList[currentIndex - 2].charValue).datatype == "string")// if the id is of type int
+        var item = getVars(scopeTree.cur, currentIndex - 2);
+        console.log(item);
+        if (item.datatype == "string")// if the id is of type int
             {
                 //continue
             }
@@ -445,13 +448,13 @@ function checkStringType() {
                     if (findVars(scopeTree.cur, currentIndex - 2))// If the variable has been declared continue
                         //scopeTree.cur.hashTable.hasItem(tokenList[currentIndex - 2].charValue ||
                     {
-                        if (tokenList[currentIndex - 2].kind == "DIGIT" || scopeTree.cur.hashTable.getItem(tokenList[currentIndex - 2].charValue).datatype == "int") //if the last token was a "
+                        if (tokenList[currentIndex - 2].kind == "DIGIT" || item.datatype == "int") //if the last token was a "
                         {
                             throw "Type missmatch: Cannot compare Strings and Ints";
                         }
                         else
                         {
-                            if (tokenList[currentIndex - 2].kind == "RPAREN" || tokenList[currentIndex - 2].kind == "BOOLVAL" || scopeTree.cur.hashTable.getItem(tokenList[currentIndex - 2].charValue).datatype == "boolean") //if the last token was a boolaen Expr
+                            if (tokenList[currentIndex - 2].kind == "RPAREN" || tokenList[currentIndex - 2].kind == "BOOLVAL" || item.datatype == "boolean") //if the last token was a boolaen Expr
                             {
                                 throw "Type missmatch: Cannot compare String and Booleans";
                             }
@@ -474,7 +477,9 @@ function checkStringType() {
 function checkBooleanType() {
     if (tokenList[currentIndex - 1].kind == "ASSIGN")// if the last token was an assignment
     {
-        if (scopeTree.cur.hashTable.getItem(tokenList[currentIndex - 2].charValue).datatype == "boolean")// if the id is of type int
+        var item = getVars(scopeTree.cur, currentIndex - 2);
+        console.log(item);
+        if (item.datatype == "boolean")// if the id is of type int
             {
                 //continue
             }
@@ -496,13 +501,13 @@ function checkBooleanType() {
                     if (findVars(scopeTree.cur, currentIndex - 2))// If the variable has been declared continue
                         //scopeTree.cur.hashTable.hasItem(tokenList[currentIndex - 2].charValue ||
                     {
-                        if (tokenList[currentIndex - 2].kind == "QUOTE" || scopeTree.cur.hashTable.getItem(tokenList[currentIndex - 2].charValue).datatype == "string") //if the last token was a "
+                        if (tokenList[currentIndex - 2].kind == "QUOTE" || item.datatype == "string") //if the last token was a "
                         {
                             throw "Type missmatch: Cannot compare Booleans and String";
                         }
                         else
                         {
-                            if (tokenList[currentIndex - 2].kind == "DIGIT" || scopeTree.cur.hashTable.getItem(tokenList[currentIndex - 2].charValue).datatype == "int") //if the last token was a boolaen Expr
+                            if (tokenList[currentIndex - 2].kind == "DIGIT" || item.datatype == "int") //if the last token was a boolaen Expr
                             {
                                 throw "Type missmatch: Cannot compare Booleans and Ints";
                             }
@@ -606,20 +611,27 @@ function getVars(node, index)
 {
     var stuff;
     if (node.parent == null)
-        {
-            console.log("Variable Not Found");
-            stuff = null;   
-        }
+    {
+        console.log("Variable Not Found");
+        stuff = null;   
+    }
     else 
     {
         if(node.hashTable.hasItem(tokenList[index].charValue))
         {
             console.log("Found it");
-            stuff = parent.hashTable.getItem(tokenList[index].charValue);
+            stuff = node.hashTable.getItem(tokenList[index].charValue);
         }
         else 
         {
-            getVars(node.parent, index);
+            if(findVars(node.parent, index))
+            {
+                stuff = getVars(node.parent, index);
+            }
+            else
+            {
+                stuff = null;
+            }
         }
     }       
     return stuff;
@@ -627,18 +639,30 @@ function getVars(node, index)
 
 function findVars(node, index)
 {
-    if (node.hashTable.hasItem(tokenList[index].charValue))
-    {
-        console.log("Found it" + " at " + parent.name);
-        return true;
-    }
-    else
-    {
-        if (node.parent == null)
+    if (node.parent == null)
         {
             console.log("Variable Not Found");
             return false;
         }
-        findVars(node.parent, index);
-    } 
+    else
+    {
+        if (node.hashTable.hasItem(tokenList[index].charValue))
+        {
+            console.log("Found it" + " at " + node.name);
+            return true;
+        }
+        else
+        {
+            console.log("Variable Not Found in" + node.name);
+            if (findVars(node.parent, index))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        } 
+    }
+    
 }

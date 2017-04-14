@@ -68,6 +68,9 @@ function SymbolTree() {
 
     // Return a string representation of the tree.
     this.toString = function() {
+        
+        var warnings = "";
+        
         // Initialize the result string.
         var traversalResult = "";
 
@@ -91,6 +94,15 @@ function SymbolTree() {
                 for (var k in node.hashTable.items) {
                     if (node.hashTable.hasItem(k)) {
                         traversalResult += ( k + " | " + node.hashTable.items[k].datatype + " | " + node.hashTable.items[k].lineNumber + " | " + node.name + ",\n");
+                        
+                        if (!node.hashTable.items[k].initialized)
+                        {
+                            warnings += "WARINING: The variable [" + k + "] was declared but not initialized\n";
+                        }
+                        if (!node.hashTable.items[k].used)
+                        {
+                            warnings += "WARINING: The variable [" + k + "] was declared but not used\n";
+                        }
                     }
                 }
                 
@@ -117,6 +129,7 @@ function SymbolTree() {
         }
         // Make the initial call to expand from the root.
         expand(this.root, 0);
+        traversalResult += warnings;
         // Return the result.
         return traversalResult;
     };

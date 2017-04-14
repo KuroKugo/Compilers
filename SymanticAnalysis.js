@@ -54,11 +54,12 @@ function ast(testchar) {
                programs++;
            }
     });
-    
+    var i = 0;
     while (programs > 0)
         {
             scope = -1;
    try {
+        result += "\nCreating AST for Program: " + i + "\n";
         parseASTProgram();
    }
     catch(e){
@@ -66,6 +67,7 @@ function ast(testchar) {
         console.log(e)
     }
             
+    result += "\n";
     //$('#astResult').append(PrintResult());
     var tree = asTree.toString();
     document.getElementById("astResult").append(tree);
@@ -75,8 +77,11 @@ function ast(testchar) {
 
    // $('#result').append(tree);
             programs--;
+            i++;
             
             asTree = new Tree;
+            scopeTree = new SymbolTree;
+            result = "";
             //asTree = ;
         }
 }
@@ -229,18 +234,22 @@ function parseASTIfStatement () {
 function parseASTExpr () {
     if(tokenList[currentIndex].kind == "DIGIT") {
          checkIntType(); // check the type
+        result += "Cheking Int Type at line " + tokenList[currentIndex].lineNum + "\n";
        
         parseASTIntExpr();
     } else if(tokenList[currentIndex].kind == "QUOTE") {
         checkStringType();
+        result += "Cheking String Type at line " + tokenList[currentIndex].lineNum + "\n";
         
         parseASTStringExpr();   
     } else if(tokenList[currentIndex].kind == "LPAREN" || tokenList[currentIndex].kind == "BOOLVAL") {
         checkBooleanType();
+        result += "Cheking Boolean Type at line " + tokenList[currentIndex].lineNum + "\n";
         
         parseASTBooleanExpr();
     } else if(tokenList[currentIndex].kind == "ID") {
         checkIdType();
+        result += "Cheking ID Type at line " + tokenList[currentIndex].lineNum + "\n";
         
         parseASTId();   
     } else {
@@ -649,7 +658,7 @@ function getVars(node, index)
     var stuff;
     if (node.parent == null)
     {
-        console.log("Variable Not Found");
+        //console.log("Variable Not Found");
         stuff = null;   
     }
     else 
@@ -676,21 +685,35 @@ function getVars(node, index)
 
 function findVars(node, index)
 {
+    if (tokenList[index].kind == "ID")
+    {
+        result += "Looking up variable " + tokenList[index].charValue + " in " + node.name + "\n";
+    }
+    
     if (node.parent == null)
         {
-            console.log("Variable Not Found");
+            if (tokenList[index].kind == "ID")
+            {
+             result += "Variable Not Found \n";
+            }
             return false;
         }
     else
     {
         if (node.hashTable.hasItem(tokenList[index].charValue))
         {
-            //console.log("Found it" + " at " + node.name);
+            if (tokenList[index].kind == "ID")
+            {
+                result += "Found " + tokenList[index].charValue + " at " + node.name + "\n ";
+            }
             return true;
         }
         else
         {
-            console.log("Variable Not Found in" + node.name);
+            if (tokenList[index].kind == "ID")
+            {
+                result += "Variable Not Found in " + node.name + "\n";
+            }
             if (findVars(node.parent, index))
             {
                 return true;

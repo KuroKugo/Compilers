@@ -63,7 +63,7 @@
       </div>
       
        <div class="col-md-2">
-      <button type="button" class="btn btn-primary btn-lg" onclick="ast($('#program').val())">Run Compiler</button>
+      <button type="button" class="btn btn-primary btn-lg" onclick="codeGen($('#program').val())">Run Compiler</button>
            
     <script src="Tree.js"></script></script>
     <script src="SymbolTree.js"></script></script>
@@ -71,6 +71,7 @@
     <script src="Lexer.js"></script></script>
     <script src="Parser.js"></script></script>
     <script src="SymanticAnalysis.js"></script></script>
+    <script src="CodeGen.js"></script></script>
     </div>
     
     <div class="col-md-3">
@@ -87,12 +88,18 @@
 
 
     <div class="col-md-3">
-    <label for="parseResult">Symbol Tree Result</label>
+    <label for="symbolTreeResult">Symbol Tree Result</label>
     <textarea class="form-control" rows="10" id="stResult"></textarea>
       </div>
  <div class="col-md-3">
-    <label for="parseResult">AST Result</label>
+    <label for="astResult">AST Result</label>
     <textarea class="form-control" rows="10" id="astResult"></textarea>
+      </div>
+</div>
+
+<div class="col-md-3">
+    <label for="codeGenResult">CodeGen Result</label>
+    <textarea class="form-control" rows="10" id="codeGenResult"></textarea>
       </div>
 </div>
 

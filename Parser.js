@@ -28,8 +28,8 @@ function parse(testchar) {
         parseProgram();    
    }
     catch(e){
-        result = result.concat(e + "The parser ended unsuccessfully. Will no procced to Semantic Analysis");
-        //console.log(e.message);
+        result = result.concat(e + "The parser ended unsuccessfully. Will not procced to Semantic Analysis");
+        sucess = false;
     }
     //$('#parseResult').append(PrintResult());
     var tree = csTree.toString();
@@ -46,7 +46,11 @@ function parse(testchar) {
 //        {
 //            ast(testchar);
 //        }
-    return tokenList;
+    if (sucess)
+    {
+        return tokenList;
+    }
+    
 }
 
 //parse functions

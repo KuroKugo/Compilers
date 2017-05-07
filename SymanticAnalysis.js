@@ -7,7 +7,7 @@ var stringArr;
 var copy;
 var scopeTree;
 var scope;
-
+var sucess = false;
 
 function ast(testchar) {
     asTree = new Tree;
@@ -63,9 +63,12 @@ function ast(testchar) {
         parseASTProgram();
    }
     catch(e){
-        result = result.concat(e + "The AST ended unsuccessfully \n");
+        result = result.concat(e + "\nThe AST ended unsuccessfully \n");
         console.log(e)
+        sucess = false;
     }
+    
+    var codeGen = [asTree, scopeTree];
             
     result += "\n";
     //$('#astResult').append(PrintResult());
@@ -76,6 +79,7 @@ function ast(testchar) {
     document.getElementById("stResult").append(tree);
 
    // $('#result').append(tree);
+            
             programs--;
             i++;
             
@@ -83,6 +87,11 @@ function ast(testchar) {
             scopeTree = new SymbolTree;
             result = "";
             //asTree = ;
+            
+            if (sucess)
+            {
+                return codeGen;
+            }
         }
 }
 
@@ -93,6 +102,7 @@ function parseASTProgram () {
     //skip $
     currentIndex++;
     
+    sucess = true;
 }
 
 function parseASTBlock () {

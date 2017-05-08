@@ -2,7 +2,7 @@ var treeHolder;
 var codeString;
 var staticString;
 var heapString;
-var heapStack;
+var heapStack = [];
 var stringHolder;
 var symbolTree;
 var asTree;
@@ -12,7 +12,9 @@ var staticCounter;
 var traversalResult;
 var codeGenString;
 var addCounter = 0;
+var slick;
 
+var heapPosition;
 var inVarDecl = false;
 var inAssign = false;
 var inPrint = false;
@@ -34,7 +36,12 @@ function codeGen(testchar) {
     heapStack = [];
     staticCounter = 0;
     heapCounter = 0;
+    heapPosition = 256;
     
+    heapStack["true"] = toHexPosition("true");
+    console.log(heapStack["true"]);
+    heapStack["false"] = toHexPosition("false");
+    console.log(heapStack["false"]);
     try {
         stExpand(symbolTree.root, 0);
     astExpand(asTree.root, 0);
@@ -47,7 +54,10 @@ function codeGen(testchar) {
     
     codeGenString = addStaticCode(staticString);
     
+    codeGenString = combine(codeGenString, heapStack);
+    
     codeGenString = addSpaces(codeGenString);
+        
     console.log(codeGenString);
     console.log(symbolTable);
     } catch (e)
@@ -55,7 +65,7 @@ function codeGen(testchar) {
         console.log(e);
     }
     
-    
+    console.log(heapString);
     document.getElementById("codeGenResult").append(codeGenString);
 }
 
@@ -131,6 +141,7 @@ function stExpand(node, depth)
 
 function astExpand(node, depth)
 {
+    
     // If there are no children (i.e., leaf nodes)...
     if (!node.children || node.children.length === 0)
     {
@@ -163,6 +174,7 @@ function astExpand(node, depth)
                     if (firstVar)
                     {
                         tempVar = symbolTable[node.name][0];
+                        slick = node.name;
                         firstVar = !firstVar;
                     }
                     else
@@ -188,6 +200,7 @@ function astExpand(node, depth)
                         traversalResult += "01";
                         traversalResult += "8D"; // Store the value
                         traversalResult += tempVar; // To a temporary location.
+                        symbolTable[slick] = [tempVar, "boolean", "true"];
                     }
                     if (node.name == "false")
                     {
@@ -195,6 +208,8 @@ function astExpand(node, depth)
                         traversalResult += "00";
                         traversalResult += "8D"; // Store the value
                         traversalResult += tempVar; // To a temporary location.
+                        
+                        symbolTable[slick] = [tempVar, "boolean", "false"];
                     }
                 }
             }
@@ -255,14 +270,25 @@ function astExpand(node, depth)
                         traversalResult += "FF"; // make the system call to print
                         inPrint = false;
                     }
+                    if (symbolTable[node.name][1] == "boolean")
+                    {
+                        traversalResult += "A0"; // Load the Y Register from with a const
+                        traversalResult += heapStack[symbolTable[node.name][2]].toString(16); // with refrence to var location
+                        traversalResult += "A2"; // Load the X register with a Constant
+                        traversalResult += "02"; // Print the static Memory stored in the Y register
+                        traversalResult += "FF"; // make the system call to print
+                        inPrint = false;
+                    }
                 }
                 if (node.name == "true" || node.name == "false")
                 {
-                    console.log("Under Construction");
-                    traversalResult += "AC"; // Load the Y Register from memory
-                    traversalResult += tempVar; // with refrence to var location
+                    //tempVar2 = "T" + staticCounter + "XX";
+                    //symbolTable["tempStr"] = [, "int"];
+                    //console.log("Under Construction");
+                    traversalResult += "A0"; // Load the Y Register from with a const
+                    traversalResult += heapStack[node.name].toString(16); // with refrence to var location
                     traversalResult += "A2"; // Load the X register with a Constant
-                    traversalResult += "01"; // Print the integer stored in the Y register
+                    traversalResult += "02"; // Print the static Memory stored in the Y register
                     traversalResult += "FF"; // make the system call to print
                     inPrint = false;
                                     
@@ -325,7 +351,7 @@ function replaceFakes(string)
     {
         codeLength++;
     }
-    //console.log(codeLength);
+    console.log(codeLength);
     temp = codeLength;
     //codeLength++;
     startLocation = codeLength.toString(16);
@@ -360,10 +386,27 @@ function toHex(string)
     {
         hexValue += (string.charCodeAt(i)).toString(16);
         //hexValue += " ";
+        heapPosition --;
     }
     hexValue += "00";
     
     return hexValue;
+}
+
+function toHexPosition(string)
+{
+    var hexValue = "";
+    
+    for (i = 0; i < string.length; i++)
+    {
+        hexValue += (string.charCodeAt(i)).toString(16);
+        //hexValue += " ";
+        heapPosition --;
+    }
+    hexValue += "00";
+    heapPosition --;
+    
+    return heapPosition;
 }
 
 function addSpaces(string)
@@ -380,6 +423,33 @@ function addSpaces(string)
                 }
         }
     return holder;
+}
+
+function combine(string, stack)
+{
+    var zeros;
+    heapString = "";
+    
+    for (var k in stack)
+    {
+        heapString = toHex(k) + heapString;
+    }
+    console.log(heapString);
+    
+    if((string.length+heapString.length)/2 > 255)
+    {
+        throw "Not Enoguh Memory";
+    }
+    else
+    {
+        zeros = (256 - (string.length+heapString.length)/2)
+        for (i = 0; i< zeros; i++)
+        {
+            string += "00";
+        }
+        string += heapString;
+    }
+    return string;
 }
 
 function addStaticCode(string)

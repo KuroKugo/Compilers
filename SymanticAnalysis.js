@@ -410,8 +410,7 @@ function matchAST (expectedToken) {
     } else {        
         //result = result.concat("Error : Expected "+ expectedToken + " recieved " + tokenList[currentIndex].kind + "at line " + tokenList[currentIndex].lineNum + "\n");
         throw "Error : Expected "+ expectedToken + " recieved " + tokenList[currentIndex].kind + " at line " + tokenList[currentIndex].lineNum + "\n";
-    }
-    
+    }   
 }
 
 function checkIntType() {

@@ -185,7 +185,7 @@ function parseASTAssignmentStatement () {
 
     parseASTId();
     
-    console.log("you made it");
+    //console.log("you made it");
     //skip =
     currentIndex++;
     
@@ -397,7 +397,15 @@ function parseASTCharList () {
 function matchAST (expectedToken) {
     if(expectedToken == tokenList[currentIndex].kind) {
         //result = result.concat("Good  on "+ expectedToken +"\n");
-        asTree.addNode(tokenList[currentIndex].charValue, "leaf");
+        if(expectedToken =="ID")
+            {
+                var name = getScope(scopeTree.cur,currentIndex);
+                asTree.addNode(tokenList[currentIndex].charValue+"@"+name.charAt(name.length-1), "leaf");
+            }
+        else{
+            asTree.addNode(tokenList[currentIndex].charValue, "leaf");
+        }
+        
         currentIndex++;
     } else {        
         //result = result.concat("Error : Expected "+ expectedToken + " recieved " + tokenList[currentIndex].kind + "at line " + tokenList[currentIndex].lineNum + "\n");
@@ -731,6 +739,49 @@ function findVars(node, index)
             else
             {
                 return false;
+            }
+        } 
+    }
+    
+}
+function getScope(node, index)
+{
+    if (tokenList[index].kind == "ID")
+    {
+        //console.log("Looking up variable " + tokenList[index].charValue + " in " + node.name + "\n");
+    }
+    
+    if (node.parent == null)
+        {
+            if (tokenList[index].kind == "ID")
+            {
+             //console.log("Variable Not Found \n");
+            }
+            return null;
+        }
+    else
+    {
+        if (node.hashTable.hasItem(tokenList[index].charValue))
+        {
+            if (tokenList[index].kind == "ID")
+            {
+                //console.log("Found " + tokenList[index].charValue + " at " + node.name + "\n ");
+            }
+            return node.name;
+        }
+        else
+        {
+            if (tokenList[index].kind == "ID")
+            {
+                //console.log("Variable Not Found in " + node.name + "\n");
+            }
+            if (findVars(node.parent, index) != null)
+            {
+                return node.name;
+            }
+            else
+            {
+                return null;
             }
         } 
     }

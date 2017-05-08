@@ -280,19 +280,34 @@ function astExpand(node, depth)
                         inPrint = false;
                     }
                 }
-                if (node.name == "true" || node.name == "false")
+                else
                 {
-                    //tempVar2 = "T" + staticCounter + "XX";
-                    //symbolTable["tempStr"] = [, "int"];
-                    //console.log("Under Construction");
-                    traversalResult += "A0"; // Load the Y Register from with a const
-                    traversalResult += heapStack[node.name].toString(16); // with refrence to var location
-                    traversalResult += "A2"; // Load the X register with a Constant
-                    traversalResult += "02"; // Print the static Memory stored in the Y register
-                    traversalResult += "FF"; // make the system call to print
-                    inPrint = false;
-                                    
+                    if (node.name == "true" || node.name == "false")
+                    {
+                        //tempVar2 = "T" + staticCounter + "XX";
+                        //symbolTable["tempStr"] = [, "int"];
+                        //console.log("Under Construction");
+                        traversalResult += "A0"; // Load the Y Register from with a const
+                        traversalResult += heapStack[node.name].toString(16); // with refrence to var location
+                        traversalResult += "A2"; // Load the X register with a Constant
+                        traversalResult += "02"; // Print the static Memory stored in the Y register
+                        traversalResult += "FF"; // make the system call to print
+                        inPrint = false;
+
+                    }
+                    else
+                    {
+                        heapStack[node.name] = toHexPosition(node.name);
+                        
+                        traversalResult += "A0"; // Load the Y Register from with a const
+                        traversalResult += heapStack[node.name].toString(16); // with refrence to var location
+                        traversalResult += "A2"; // Load the X register with a Constant
+                        traversalResult += "02"; // Print the static Memory stored in the Y register
+                        traversalResult += "FF"; // make the system call to print
+                        inPrint = false;
+                    }
                 }
+                
             }
             else // Is a Number
             {

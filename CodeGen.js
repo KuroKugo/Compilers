@@ -35,8 +35,8 @@ function codeGen(testchar) {
     staticCounter = 0;
     heapCounter = 0;
     
-    
-    stExpand(symbolTree.root, 0);
+    try {
+        stExpand(symbolTree.root, 0);
     astExpand(asTree.root, 0);
     
     codeString = traversalResult;
@@ -50,6 +50,11 @@ function codeGen(testchar) {
     codeGenString = addSpaces(codeGenString);
     console.log(codeGenString);
     console.log(symbolTable);
+    } catch (e)
+    {
+        console.log(e);
+    }
+    
     
     document.getElementById("codeGenResult").append(codeGenString);
 }
@@ -126,7 +131,6 @@ function stExpand(node, depth)
 
 function astExpand(node, depth)
 {
-    
     // If there are no children (i.e., leaf nodes)...
     if (!node.children || node.children.length === 0)
     {
@@ -154,7 +158,6 @@ function astExpand(node, depth)
         {
             if (isNaN(node.name)) // If we are not a Number
             {
-                
                 if (node.name.charAt(1) == "@") // If we are an ID
                 {
                     if (firstVar)
@@ -166,9 +169,9 @@ function astExpand(node, depth)
                     {
                         tempVar2 = symbolTable[node.name][0];
                         
-                        traversalResult += "AD" // Load from memory
+                        traversalResult += "AD"; // Load from memory
                         traversalResult += tempVar; // To a temporary location 1.
-                        traversalResult += "8D" // Store the value from memory
+                        traversalResult += "8D"; // Store the value from memory
                         traversalResult += tempVar2 // to temporary location 2
                         inAssign = false;
                         firstVar = !firstVar;   
@@ -176,6 +179,23 @@ function astExpand(node, depth)
                     
                     //traversalResult += symbolTable[node.name]; // To a temporary location.
                     //inAssign = false;
+                }
+                else
+                {
+                    if (node.name == "true")
+                    {
+                        traversalResult += "A9"; //Load with the constant
+                        traversalResult += "01";
+                        traversalResult += "8D"; // Store the value
+                        traversalResult += tempVar; // To a temporary location.
+                    }
+                    if (node.name == "false")
+                    {
+                        traversalResult += "A9"; //Load with the constant
+                        traversalResult += "00";
+                        traversalResult += "8D"; // Store the value
+                        traversalResult += tempVar; // To a temporary location.
+                    }
                 }
             }
             else // Is a Number
@@ -185,18 +205,18 @@ function astExpand(node, depth)
                 {
                     if (added)
                     {
-                        traversalResult += "A9" //Load with the constant
-                        traversalResult += "0" + node.name // 0 and Some number between 0-9
-                        traversalResult += "6D" // Store the value
+                        traversalResult += "A9"; //Load with the constant
+                        traversalResult += "0" + node.name; // 0 and Some number between 0-9
+                        traversalResult += "6D"; // Store the value
                         traversalResult += tempVar2; // To a temporary location
-                        traversalResult += "8D" // Store the value
+                        traversalResult += "8D"; // Store the value
                         traversalResult += tempVar; // To a temporary location
                     }
                     else
                     {
-                        traversalResult += "A9" //Load with the constant
-                        traversalResult += "0" + node.name // 0 and Some number between 0-9
-                        traversalResult += "8D" // Store the value
+                        traversalResult += "A9"; //Load with the constant
+                        traversalResult += "0" + node.name; // 0 and Some number between 0-9
+                        traversalResult += "8D"; // Store the value
                         traversalResult += tempVar; // To a temporary location.
                     }
                     inAssign = false;
@@ -205,11 +225,11 @@ function astExpand(node, depth)
                 {//A9 01 6D EC 00 8D EC 00 A9 09 6D EC 00 8D EB 00
                     tempVar2 = "T" + staticCounter + "XX";
                     symbolTable["tempInt"] = [tempVar2, "int"];
-                    traversalResult += "A9" //Load with the constant
-                    traversalResult += "0" + node.name // 0 and Some number between 0-9
-                    traversalResult += "6D" // Store the value
+                    traversalResult += "A9"; //Load with the constant
+                    traversalResult += "0" + node.name; // 0 and Some number between 0-9
+                    traversalResult += "6D"; // Store the value
                     traversalResult += tempVar2; // To a temporary location
-                    traversalResult += "8D" // Store the value
+                    traversalResult += "8D"; // Store the value
                     traversalResult += tempVar2; // To a temporary location
                  
                     addCounter--;
@@ -228,9 +248,9 @@ function astExpand(node, depth)
                     if (symbolTable[node.name][1] == "int")
                     {
                         tempVar = symbolTable[node.name][0];
-                        traversalResult += "AC" // Load the Y Register from memory
-                        traversalResult += tempVar // with refrence to var location
-                        traversalResult += "A2" // Load the X register with a Constant
+                        traversalResult += "AC"; // Load the Y Register from memory
+                        traversalResult += tempVar; // with refrence to var location
+                        traversalResult += "A2"; // Load the X register with a Constant
                         traversalResult += "01"; // Print the integer stored in the Y register
                         traversalResult += "FF"; // make the system call to print
                         inPrint = false;
@@ -238,12 +258,10 @@ function astExpand(node, depth)
                 }
                 if (node.name == "true" || node.name == "false")
                 {
-                    heapStack.push(toHex(node.name));
-                    findMemoyLoc(heapStack);
-                    
-                    traversalResult += "AC" // Load the Y Register from memory
-                    traversalResult += tempVar // with refrence to var location
-                    traversalResult += "A2" // Load the X register with a Constant
+                    console.log("Under Construction");
+                    traversalResult += "AC"; // Load the Y Register from memory
+                    traversalResult += tempVar; // with refrence to var location
+                    traversalResult += "A2"; // Load the X register with a Constant
                     traversalResult += "01"; // Print the integer stored in the Y register
                     traversalResult += "FF"; // make the system call to print
                     inPrint = false;
@@ -252,9 +270,9 @@ function astExpand(node, depth)
             }
             else // Is a Number
             {
-                traversalResult += "A0" // Load the Y Register from memory
+                traversalResult += "A0"; // Load the Y Register from memory
                 traversalResult += "0" + node.name; // 0 and Some number between 0-9
-                traversalResult += "A2" // Load the X register with a Constant
+                traversalResult += "A2"; // Load the X register with a Constant
                 traversalResult += "01"; // Print the integer stored in the Y register
                 traversalResult += "FF"; // make the system call to print
                 inPrint = false;
@@ -274,6 +292,7 @@ function astExpand(node, depth)
         if (node.name =="AssignmentStatement")
         {
             inAssign = true;
+            firstVar = true;
         }
         if (node.name == "PrintStatement")
         {
@@ -284,7 +303,6 @@ function astExpand(node, depth)
             //console.log("Under Construction");
             addCounter++;
             added = true;
-            
             //traversalResult += "A9" // Load from memory
             
         }

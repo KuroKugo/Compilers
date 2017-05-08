@@ -194,23 +194,44 @@ function astExpand(node, depth)
                 }
                 else
                 {
-                    if (node.name == "true")
+                    if (heapStack[node.name] == undefined)
                     {
+                        heapStack[node.name] = toHexPosition(node.name);
+                    }
+                    
+                    //console.log(node.name);
+                    if(symbolTable[slick][1] == "boolean")
+                    {
+                        if (node.name == "true")
+                        {
+                            traversalResult += "A9"; //Load with the constant
+                            traversalResult += "01";
+                            traversalResult += "8D"; // Store the value
+                            traversalResult += tempVar; // To a temporary location.
+                            symbolTable[slick] = [tempVar, "boolean", "true"];
+                            inAssign = false;
+                        }
+                        if (node.name == "false")
+                        {
+                            traversalResult += "A9"; //Load with the constant
+                            traversalResult += "00";
+                            traversalResult += "8D"; // Store the value
+                            traversalResult += tempVar; // To a temporary location.
+
+                            symbolTable[slick] = [tempVar, "boolean", "false"];
+                            inAssign = false;
+                        }       
+                    }
+                    else
+                    {
+                        //console.log(tempVar)
                         traversalResult += "A9"; //Load with the constant
-                        traversalResult += "01";
+                        traversalResult += heapStack[node.name].toString(16);
                         traversalResult += "8D"; // Store the value
                         traversalResult += tempVar; // To a temporary location.
-                        symbolTable[slick] = [tempVar, "boolean", "true"];
+                        inAssign = false;
                     }
-                    if (node.name == "false")
-                    {
-                        traversalResult += "A9"; //Load with the constant
-                        traversalResult += "00";
-                        traversalResult += "8D"; // Store the value
-                        traversalResult += tempVar; // To a temporary location.
-                        
-                        symbolTable[slick] = [tempVar, "boolean", "false"];
-                    }
+                    
                 }
             }
             else // Is a Number
@@ -279,9 +300,24 @@ function astExpand(node, depth)
                         traversalResult += "FF"; // make the system call to print
                         inPrint = false;
                     }
+                    if (symbolTable[node.name][1] == "string")
+                    {
+                        tempVar = symbolTable[node.name][0];
+                        traversalResult += "AC"; // Load the Y Register from with a const
+                        traversalResult += tempVar; // with refrence to var location
+                        traversalResult += "A2"; // Load the X register with a Constant
+                        traversalResult += "02"; // Print the static Memory stored in the Y register
+                        traversalResult += "FF"; // make the system call to print
+                        inPrint = false;
+                    }
                 }
                 else
                 {
+                    if (heapStack[node.name] == undefined)
+                    {
+                        heapStack[node.name] = toHexPosition(node.name);
+                    }
+                    
                     if (node.name == "true" || node.name == "false")
                     {
                         //tempVar2 = "T" + staticCounter + "XX";
@@ -296,9 +332,7 @@ function astExpand(node, depth)
 
                     }
                     else
-                    {
-                        heapStack[node.name] = toHexPosition(node.name);
-                        
+                    {   
                         traversalResult += "A0"; // Load the Y Register from with a const
                         traversalResult += heapStack[node.name].toString(16); // with refrence to var location
                         traversalResult += "A2"; // Load the X register with a Constant
@@ -318,6 +352,16 @@ function astExpand(node, depth)
                 traversalResult += "FF"; // make the system call to print
                 inPrint = false;
             }
+        }
+        
+        if (inIf)
+        {
+            
+        }
+        
+        if (inWhile)
+        {
+            
         }
     }
     else
@@ -344,9 +388,17 @@ function astExpand(node, depth)
             //console.log("Under Construction");
             addCounter++;
             added = true;
-            //traversalResult += "A9" // Load from memory
-            
+            //traversalResult += "A9" // Load from memory    
         }
+        if (node.name == "WhileStatement")
+        {
+            inWhile = true;
+        }
+        if (node.name == "IfStatement")
+        {
+            inIf = true;
+        }
+        //if (node.name == "")
         for (var i = 0; i < node.children.length; i++)
         {
             astExpand(node.children[i], depth + 1);

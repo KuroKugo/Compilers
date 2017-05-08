@@ -13,6 +13,11 @@ var traversalResult;
 var codeGenString;
 var addCounter = 0;
 var slick;
+var stop = true;
+var startLoc = 0;
+var endLoc = 0;
+var alwaysTrue = false;
+var jump = 0;
 
 var heapPosition;
 var inVarDecl = false;
@@ -281,6 +286,7 @@ function astExpand(node, depth)
             {
                 if (node.name.charAt(1) == "@")
                 {
+                    console.log(node.name)
                     if (symbolTable[node.name][1] == "int")
                     {
                         tempVar = symbolTable[node.name][0];
@@ -354,14 +360,9 @@ function astExpand(node, depth)
             }
         }
         
-        if (inIf)
-        {
-            
-        }
-        
         if (inWhile)
         {
-            
+            endLoc = endLoc+5;
         }
     }
     else
@@ -392,16 +393,67 @@ function astExpand(node, depth)
         }
         if (node.name == "WhileStatement")
         {
-            inWhile = true;
+            if (node.children[0].name == "false")
+            {
+                stop = false;
+            }
+            else
+            {
+                if (node.children[0].name == "true")
+                {
+                    inWhile = true;
+                    alwaysTrue = true;
+                    startLoc = traversalResult.length/2;
+                    endLoc = startLoc;
+                }
+                else
+                {
+                    if (node.children[0].name == "false")
+                    {
+                        inWhile = false;
+                        alwaysTrue = false;
+                        stop = false;
+                    }
+                }
+            }
         }
         if (node.name == "IfStatement")
         {
-            inIf = true;
+            if (node.children[0].name == "false")
+            {
+                stop = false;
+            }
+            else
+            {
+                
+            }
         }
         //if (node.name == "")
-        for (var i = 0; i < node.children.length; i++)
+        if(stop)
         {
-            astExpand(node.children[i], depth + 1);
+            for (var i = 0; i < node.children.length; i++)
+            {
+                astExpand(node.children[i], depth + 1);
+            }
+            stop = true;
+        }
+        if (inWhile)
+        {
+            if(alwaysTrue)
+            {
+                jump = endLoc - startLoc;
+                console.log(jump);
+                jump = 256-jump;
+                console.log(jump);
+                traversalResult += "A2";
+                traversalResult += "00";
+                traversalResult += "EC";
+                traversalResult += "FE";
+                traversalResult += "00";
+                traversalResult += "D0";
+                traversalResult += jump.toString(16);
+                alwaysTrue = false;
+            }
         }
     }
 }

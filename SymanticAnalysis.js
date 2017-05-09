@@ -399,8 +399,8 @@ function matchAST (expectedToken) {
         //result = result.concat("Good  on "+ expectedToken +"\n");
         if(expectedToken =="ID")
             {
-                var name = getScope(scopeTree.cur,currentIndex);
-                asTree.addNode(tokenList[currentIndex].charValue+"@"+name.charAt(name.length-1), "leaf");
+                findVars(scopeTree.cur,currentIndex);
+                asTree.addNode(tokenList[currentIndex].charValue+"@"+stuff.charAt(stuff.length-1), "leaf");
             }
         else{
             asTree.addNode(tokenList[currentIndex].charValue, "leaf");
@@ -410,7 +410,8 @@ function matchAST (expectedToken) {
     } else {        
         //result = result.concat("Error : Expected "+ expectedToken + " recieved " + tokenList[currentIndex].kind + "at line " + tokenList[currentIndex].lineNum + "\n");
         throw "Error : Expected "+ expectedToken + " recieved " + tokenList[currentIndex].kind + " at line " + tokenList[currentIndex].lineNum + "\n";
-    }   
+    }
+    
 }
 
 function checkIntType() {
@@ -700,6 +701,7 @@ function getVars(node, index)
     return stuff;
 }
 
+var stuff;
 function findVars(node, index)
 {
     if (tokenList[index].kind == "ID")
@@ -723,6 +725,7 @@ function findVars(node, index)
             {
                 result += "Found " + tokenList[index].charValue + " at " + node.name + "\n ";
             }
+            stuff = node.name;
             return true;
         }
         else
@@ -743,6 +746,7 @@ function findVars(node, index)
     }
     
 }
+
 function getScope(node, index)
 {
     if (tokenList[index].kind == "ID")

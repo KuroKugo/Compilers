@@ -18,6 +18,10 @@ var startLoc = 0;
 var endLoc = 0;
 var alwaysTrue = false;
 var jump = 0;
+var inEqual =false;
+var inNotEqual = false;
+var jumpCounter = 0;
+var jumpTable = [];
 
 var heapPosition;
 var inVarDecl = false;
@@ -44,16 +48,16 @@ function codeGen(testchar) {
     heapPosition = 256;
     
     heapStack["true"] = toHexPosition("true");
-    console.log(heapStack["true"]);
+    //console.log(heapStack["true"]);
     heapStack["false"] = toHexPosition("false");
-    console.log(heapStack["false"]);
+    //console.log(heapStack["false"]);
     try {
         stExpand(symbolTree.root, 0);
     astExpand(asTree.root, 0);
     
     codeString = traversalResult;
     codeString += "00";
-    console.log(codeString);
+    //console.log(codeString);
     
     staticString = replaceFakes(codeString);
     
@@ -65,12 +69,13 @@ function codeGen(testchar) {
         
     console.log(codeGenString);
     console.log(symbolTable);
+    console.log(jumpTable);
     } catch (e)
     {
         console.log(e);
     }
     
-    console.log(heapString);
+    //console.log(heapString);
     document.getElementById("codeGenResult").append(codeGenString);
 }
 
@@ -199,7 +204,7 @@ function astExpand(node, depth)
                 }
                 else
                 {
-                    if (heapStack[node.name] == undefined)
+                    if (heapStack[node.name] == undefined)// Add a string to the heap
                     {
                         heapStack[node.name] = toHexPosition(node.name);
                     }
@@ -207,25 +212,33 @@ function astExpand(node, depth)
                     //console.log(node.name);
                     if(symbolTable[slick][1] == "boolean")
                     {
-                        if (node.name == "true")
+                        if (inEqual)
                         {
-                            traversalResult += "A9"; //Load with the constant
-                            traversalResult += "01";
-                            traversalResult += "8D"; // Store the value
-                            traversalResult += tempVar; // To a temporary location.
-                            symbolTable[slick] = [tempVar, "boolean", "true"];
-                            inAssign = false;
+                            
                         }
-                        if (node.name == "false")
+                        else
                         {
-                            traversalResult += "A9"; //Load with the constant
-                            traversalResult += "00";
-                            traversalResult += "8D"; // Store the value
-                            traversalResult += tempVar; // To a temporary location.
+                            if (node.name == "true")
+                            {
+                                traversalResult += "A9"; //Load with the constant
+                                traversalResult += "01";
+                                traversalResult += "8D"; // Store the value
+                                traversalResult += tempVar; // To a temporary location.
+                                symbolTable[slick] = [tempVar, "boolean", "true"];
+                                inAssign = false;
+                            }
+                            if (node.name == "false")
+                            {
+                                traversalResult += "A9"; //Load with the constant
+                                traversalResult += "00";
+                                traversalResult += "8D"; // Store the value
+                                traversalResult += tempVar; // To a temporary location.
 
-                            symbolTable[slick] = [tempVar, "boolean", "false"];
-                            inAssign = false;
-                        }       
+                                symbolTable[slick] = [tempVar, "boolean", "false"];
+                                inAssign = false;
+                            }       
+                        }
+                        
                     }
                     else
                     {
@@ -252,6 +265,7 @@ function astExpand(node, depth)
                         traversalResult += tempVar2; // To a temporary location
                         traversalResult += "8D"; // Store the value
                         traversalResult += tempVar; // To a temporary location
+                        staticCounter++;
                     }
                     else
                     {
@@ -351,12 +365,49 @@ function astExpand(node, depth)
             }
             else // Is a Number
             {
-                traversalResult += "A0"; // Load the Y Register from memory
-                traversalResult += "0" + node.name; // 0 and Some number between 0-9
-                traversalResult += "A2"; // Load the X register with a Constant
-                traversalResult += "01"; // Print the integer stored in the Y register
-                traversalResult += "FF"; // make the system call to print
-                inPrint = false;
+                if(addCounter == 0)
+                {
+                    if (added)
+                    {
+                        traversalResult += "A9"; //Load with the constant
+                        traversalResult += "0" + node.name; // 0 and Some number between 0-9
+                        traversalResult += "6D"; // keep result in accumulator
+                        traversalResult += tempVar2; // To a temporary location
+                        traversalResult += "8D"; // Store the value
+                        traversalResult += tempVar2; // To a temporary location
+                        
+                        traversalResult += "AC"; // Load the Y Register from memory
+                        traversalResult += tempVar2; // the location of tempVar2
+                        traversalResult += "A2"; // Load the X register with a Constant
+                        traversalResult += "01"; // Print the integer stored in the Y register
+                        traversalResult += "FF"; // make the system call to print
+                        inPrint = false;
+                    }
+                    else
+                    {
+                        traversalResult += "A0"; // Load the Y Register with a constant
+                        traversalResult += "0" + node.name; // 0 and Some number between 0-9
+                        traversalResult += "A2"; // Load the X register with a Constant
+                        traversalResult += "01"; // Print the integer stored in the Y register
+                        traversalResult += "FF"; // make the system call to print
+                        inPrint = false;
+                    }
+                    inPrint = false;
+                }
+                else
+                {//A9 01 6D EC 00 8D EC 00 A9 09 6D EC 00 8D EB 00
+                    tempVar2 = "T" + staticCounter + "XX";
+                    symbolTable["tempInt"] = [tempVar2, "int"];
+                    traversalResult += "A9"; //Load with the constant
+                    traversalResult += "0" + node.name; // 0 and Some number between 0-9
+                    traversalResult += "6D"; // Store the value
+                    traversalResult += tempVar2; // To a temporary location
+                    traversalResult += "8D"; // Store the value
+                    traversalResult += tempVar2; // To a temporary location
+                 
+                    addCounter--;
+                }
+                
             }
         }
         
@@ -391,31 +442,77 @@ function astExpand(node, depth)
             added = true;
             //traversalResult += "A9" // Load from memory    
         }
+        
         if (node.name == "WhileStatement")
         {
-            if (node.children[0].name == "false")
+                inWhile = true;
+                startLoc = traversalResult.length/2;
+                endLoc = startLoc;
+        }
+        if (inWhile)
+        {
+            if (node.name == "isNotEqual")
             {
-                stop = false;
+                //tempVar = "T" + staticCounter + "XX";
+                inNotEqual = true;
+                
+                if (heapStack[node.children[0].name] != undefined && heapStack[node.children[1].name] != undefined)
+                {
+                    traversalResult += "AE";
+                    traversalResult += heapStack[node.children[0].name].toString(16);
+                    traversalResult += "00";
+                    traversalResult += "EC";
+                    traversalResult += heapStack[node.children[1].name].toString(16);
+                    traversalResult += "00";
+                    traversalResult += "D0";
+                    traversalResult += "J" + jumpCounter;
+                    
+                    var temp;
+                    temp = "J" + jumpCounter;
+                    jumpTable[temp] = [temp, 0];
+                    jumpCounter++;
+                }
             }
             else
             {
-                if (node.children[0].name == "true")
+                if (node.name == "isEqual")
                 {
-                    inWhile = true;
-                    alwaysTrue = true;
-                    startLoc = traversalResult.length/2;
-                    endLoc = startLoc;
+                    //tempVar = "T" + staticCounter + "XX";
+                    inEqual = true;
+                    if (heapStack[node.children[0].name] != undefined && heapStack[node.children[0].name] != undefined)
+                    {
+                        traversalResult += "AE";
+                        traversalResult += heapStack[node.children[0].name].toString(16);
+                        traversalResult += "00";
+                        traversalResult += "EC";
+                        traversalResult += heapStack[node.children[1].name].toString(16);
+                        traversalResult += "00";
+                        traversalResult += "D0";
+                        traversalResult += "J" + jumpCounter;
+                        
+                        var temp;
+                        temp = "J" + jumpCounter;
+                        jumpTable[temp] = [temp, 0];
+                        jumpCounter++;
+                    }
                 }
                 else
                 {
-                    if (node.children[0].name == "false")
+                    if (node.children[0].name == "true")
                     {
-                        inWhile = false;
-                        alwaysTrue = false;
-                        stop = false;
+                        alwaysTrue = true;
+                    }
+                    else
+                    {
+                        if (node.children[0].name == "false")
+                        {
+                            inWhile = false;
+                            alwaysTrue = false;
+                            stop = false;
+                        }
                     }
                 }
-            }
+            } 
         }
         if (node.name == "IfStatement")
         {
@@ -428,7 +525,7 @@ function astExpand(node, depth)
                 
             }
         }
-        //if (node.name == "")
+
         if(stop)
         {
             for (var i = 0; i < node.children.length; i++)
@@ -437,24 +534,57 @@ function astExpand(node, depth)
             }
             stop = true;
         }
+        
         if (inWhile)
         {
-            if(alwaysTrue)
+             if (inNotEqual)
             {
+                var hex;
                 jump = endLoc - startLoc;
-                console.log(jump);
                 jump = 256-jump;
-                console.log(jump);
-                traversalResult += "A2";
-                traversalResult += "00";
-                traversalResult += "EC";
-                traversalResult += "FE";
-                traversalResult += "00";
-                traversalResult += "D0";
-                traversalResult += jump.toString(16);
-                alwaysTrue = false;
+                hex = jump.toString(16);
+                
+                console.log(traversalResult);
+                var re = new RegExp(temp,"g");
+                //console.log("Running Replace : "+ symbolTable[k][0] + " with "+ startLocation+"00");
+                traversalResult = traversalResult.replace(re, hex);
+                console.log(traversalResult);
+                inNotEqual = false;
+            }
+            if (inEqual)
+            {
+                var hex;
+                jump = endLoc - startLoc;
+                jump = 256-jump;
+                hex = jump.toString(16);
+                
+                console.log(temp);
+                var re = new RegExp(temp,"g");
+                //console.log("Running Replace : "+ symbolTable[k][0] + " with "+ startLocation+"00");
+                traversalResult = traversalResult.replace(re, hex);
+                console.log(traversalResult);
+                inEqual = false;
             }
         }
+        
+        
+        if(alwaysTrue)
+        {
+            jump = endLoc - startLoc;
+            console.log(jump);
+            jump = 256-jump;
+            console.log(jump);
+            traversalResult += "A2";
+            traversalResult += "00";
+            traversalResult += "EC";
+            traversalResult += "FE";
+            traversalResult += "00";
+            traversalResult += "D0";
+            traversalResult += jump.toString(16);
+            alwaysTrue = false;
+        }
+        
+        
     }
 }
 
@@ -470,7 +600,7 @@ function replaceFakes(string)
     {
         codeLength++;
     }
-    console.log(codeLength);
+    //console.log(codeLength);
     temp = codeLength;
     //codeLength++;
     startLocation = codeLength.toString(16);
@@ -553,7 +683,7 @@ function combine(string, stack)
     {
         heapString = toHex(k) + heapString;
     }
-    console.log(heapString);
+    //console.log(heapString);
     
     if((string.length+heapString.length)/2 > 255)
     {
